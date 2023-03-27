@@ -1,0 +1,10 @@
+
+Library/*
+UserSettings/*
+obj/*
+.idea/*
+.vs/*
+.vsconfig
+Temp/*
+ProjectSettings/*
+Logs/*
