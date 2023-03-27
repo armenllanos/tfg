@@ -6,5 +6,4 @@ obj/*
 .vs/*
 .vsconfig
 Temp/*
-ProjectSettings/*
-Logs/*
+
