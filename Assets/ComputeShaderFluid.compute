@@ -1,0 +1,62 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+#pragma enable_d3d11_debug_symbols
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWTexture2D<float4> Result;
+
+int numX;
+int numY;
+int numZ;
+
+RWStructuredBuffer<double> u;
+RWStructuredBuffer<double> v;
+RWStructuredBuffer<double> w;
+RWStructuredBuffer<double> auxU;
+RWStructuredBuffer<double> auxV;
+RWStructuredBuffer<double> auxW;
+RWStructuredBuffer<int> s;
+
+float Resolution;
+
+[numthreads(10,10,10)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    /*float x = id.x/Resolution;
+    float y = id.y/Resolution;
+    Result[id.xy] = float4(x ,y,0.0,0.0);*/
+    // TODO: insert actual code here!
+    int i = id.x;
+    int j = id.y;
+    int k = id.z;
+    if (s[i*numZ*numY+ j*numZ+ k] != 0)
+    {
+        
+        int actualS = s[(i + 1)*numZ*numY+ j*numZ+ k] + s[(i - 1) * numZ*numY + j * numZ + k] + s[i* numZ*numY+( j + 1)*numZ+ k] +
+            s[i * numZ*numY + (j - 1) * numZ + k ] + s[i*numZ*numY+ j*numZ+ (k - 1)] + s[i * numY*numZ + j * numZ + (k + 1)];
+        if (actualS != 0)
+        {
+            double outflow = u[(i + 1) * numZ*numY + j * numZ + k] - u[i * numZ*numY + j * numZ + k] + v[i * numZ*numY + (j + 1) * numZ+ k] -
+                v[i * numZ*numY + j  * numZ + k] + w[i * numZ*numY + j * numZ + (k + 1)] - w[i * numZ*numY + j * numZ + k];
+
+            auxU[i * numZ*numY + j * numZ + k] =
+                u[i * numZ*numY + j * numZ + k] + outflow * s[(i - 1) * numZ*numY + j * numZ + k] / actualS;
+            
+            auxU[(i + 1) * numZ*numY + j * numZ + k] =
+                u[(i + 1) * numZ*numY + j * numZ + k] - outflow * s[(i + 1) * numZ*numY + j * numZ + k] / actualS;
+           
+            auxV[i * numZ*numY + j * numZ + k] =
+                v[i * numZ*numY + j * numZ + k] + outflow * s[i * numZ*numY + (j - 1) * numZ + k] / actualS;
+            
+            auxV[i * numZ*numY + (j + 1) * numZ + k] =
+                v[i * numZ*numY + (j + 1) * numZ + k] - outflow * s[i * numZ*numY + (j + 1) * numZ + k] / actualS;
+           
+            auxW[i * numZ*numY + j * numZ + k] =
+                w[i * numZ*numY + j * numZ + k] + outflow * s[i * numZ*numY + j * numZ + (k - 1)] / actualS;
+            
+            auxW[i * numZ*numY + j * numZ + (k + 1)] =
+                w[i * numZ*numY + j * numZ + (k + 1)] - outflow * s[i * numZ*numY + j * numZ + (k + 1)] / actualS;
+        }
+    }
+}
+

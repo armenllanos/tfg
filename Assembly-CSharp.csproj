@@ -42,14 +42,21 @@
   </PropertyGroup>
   <ItemGroup>
      <Compile Include="Assets\Fluid3D.cs" />
+     <Compile Include="Assets\Creator2D.cs" />
      <Compile Include="Assets\Creator.cs" />
      <Compile Include="Assets\EulerFluid.cs" />
+     <Compile Include="Assets\Ventilador.cs" />
      <Compile Include="Assets\Instancer.cs" />
+     <Compile Include="Assets\ComputerShaderTest.cs" />
      <Compile Include="Assets\CubeGenerator.cs" />
+     <Compile Include="Assets\Fluid2D.cs" />
+     <Compile Include="Assets\ExampleGPU.cs" />
      <Compile Include="Assets\MeshGenerator.cs" />
+     <Compile Include="Assets\pruebaInterfaz.cs" />
      <Folder Include="Assets" />
      <None Include="Library\PackageCache\com.unity.modules.subsystems@1.0.0\package.json" />
      <None Include="Library\PackageCache\com.unity.modules.jsonserialize@1.0.0\package.json" />
+     <None Include="Assets\settingsEXample.uxml" />
      <None Include="Library\PackageCache\com.unity.modules.screencapture@1.0.0\package.json" />
      <None Include="Library\PackageCache\com.unity.modules.cloth@1.0.0\package.json" />
      <Folder Include="Library\PackageCache\com.unity.modules.imgui@1.0.0" />
@@ -58,11 +65,14 @@
      <Folder Include="Library\PackageCache\com.unity.modules.animation@1.0.0" />
      <None Include="Library\PackageCache\com.unity.ugui@1.0.0\package.json" />
      <Folder Include="Library\PackageCache\com.unity.modules.xr@1.0.0" />
+     <None Include="Assets\ExampleGPU.compute" />
      <None Include="Library\PackageCache\com.unity.modules.assetbundle@1.0.0\package.json" />
      <None Include="Library\PackageCache\com.unity.modules.imgui@1.0.0\package.json" />
      <None Include="Library\PackageCache\com.unity.modules.tilemap@1.0.0\package.json" />
      <Folder Include="Library\PackageCache\com.unity.modules.assetbundle@1.0.0" />
+     <Folder Include="Assets\UI Toolkit\UnityThemes" />
      <None Include="Library\PackageCache\com.unity.modules.terrainphysics@1.0.0\package.json" />
+     <None Include="Assets\ComputeShaderFluid.compute" />
      <Folder Include="Library\PackageCache\com.unity.modules.screencapture@1.0.0" />
      <Folder Include="Library\PackageCache\com.unity.modules.cloth@1.0.0" />
      <None Include="Library\PackageCache\com.unity.modules.unitywebrequestassetbundle@1.0.0\package.json" />
@@ -76,8 +86,10 @@
      <None Include="Library\PackageCache\com.unity.modules.unityanalytics@1.0.0\package.json" />
      <Folder Include="Library\PackageCache\com.unity.modules.subsystems@1.0.0" />
      <None Include="Library\PackageCache\com.unity.modules.video@1.0.0\package.json" />
+     <Folder Include="Assets\UI Toolkit" />
      <Folder Include="Library\PackageCache\com.unity.modules.unityanalytics@1.0.0" />
      <Folder Include="Library\PackageCache\com.unity.modules.physics@1.0.0" />
+     <None Include="Assets\2DComputing.compute" />
      <Folder Include="Library\PackageCache\com.unity.modules.vr@1.0.0" />
      <Folder Include="Library\PackageCache\com.unity.modules.physics2d@1.0.0" />
      <None Include="Library\PackageCache\com.unity.modules.particlesystem@1.0.0\package.json" />
@@ -91,7 +103,9 @@
      <Folder Include="Library\PackageCache\com.unity.ugui@1.0.0\Tests" />
      <None Include="Library\PackageCache\com.unity.modules.umbra@1.0.0\package.json" />
      <Folder Include="Library\PackageCache\com.unity.modules.tilemap@1.0.0" />
+     <None Include="Assets\ussSettings.uss" />
      <Folder Include="Library\PackageCache\com.unity.modules.ui@1.0.0" />
+     <None Include="Assets\menu.uxml" />
      <Folder Include="Library\PackageCache\com.unity.modules.androidjni@1.0.0" />
      <None Include="Library\PackageCache\com.unity.modules.audio@1.0.0\package.json" />
      <None Include="Library\PackageCache\com.unity.modules.physics@1.0.0\package.json" />
@@ -99,6 +113,8 @@
      <None Include="Library\PackageCache\com.unity.modules.uielementsnative@1.0.0\package.json" />
      <None Include="Library\PackageCache\com.unity.modules.unitywebrequestwww@1.0.0\package.json" />
      <None Include="Library\PackageCache\com.unity.modules.unitywebrequestaudio@1.0.0\package.json" />
+     <None Include="Assets\menu.uss" />
+     <None Include="Assets\datos Ventilador.uxml" />
      <Folder Include="Library\PackageCache\com.unity.modules.vehicles@1.0.0" />
      <None Include="Library\PackageCache\com.unity.modules.xr@1.0.0\package.json" />
      <Folder Include="Library\PackageCache\com.unity.modules.umbra@1.0.0" />
@@ -773,6 +789,9 @@
      </Reference>
      <Reference Include="Unity.VisualScripting.SettingsProvider.Editor">
      <HintPath>C:\Users\MSI\My project (1)\Library\ScriptAssemblies\Unity.VisualScripting.SettingsProvider.Editor.dll</HintPath>
+     </Reference>
+     <Reference Include="Unity.Scripting.Python.Editor">
+     <HintPath>C:\Users\MSI\My project (1)\Library\ScriptAssemblies\Unity.Scripting.Python.Editor.dll</HintPath>
      </Reference>
      <Reference Include="Unity.TestTools.CodeCoverage.Editor.OpenCover.Mono.Reflection">
      <HintPath>C:\Users\MSI\My project (1)\Library\ScriptAssemblies\Unity.TestTools.CodeCoverage.Editor.OpenCover.Mono.Reflection.dll</HintPath>

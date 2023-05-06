@@ -1,8 +1,19 @@
-﻿using System;
+﻿
+
+using System.Runtime.InteropServices;
+
+
+
+
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
+
 using Unity.VisualScripting;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
+
 
 namespace DefaultNamespace
 {
@@ -20,7 +31,7 @@ namespace DefaultNamespace
         private float[] newU;
         private float[] newV;
         private double[,,] p;
-        int[,,] s;
+        public int[,,] s;
         public double[,,] smokeField;
         private float[] newM;
         private double overrelaxation = 1.9999;
@@ -29,9 +40,12 @@ namespace DefaultNamespace
         static double[,,] auxU;
         static double[,,] auxV;
         static double[,,] auxW;
+        private ComputeShader computeShader;
 
-        public Fluid3D(double density, int numX, int numY, int numZ, float height, float speed, string mode)
+        public Fluid3D(double density, int numX, int numY, int numZ, float height, float speed, string mode,ComputeShader computeShader)
         {
+
+            this.computeShader = computeShader;
             this.mode = mode;
             this.speed = speed;
             this.density = density;
@@ -49,11 +63,11 @@ namespace DefaultNamespace
             Fluid3D.auxU = new double[this.numX, this.numY, this.numZ];
             Fluid3D.auxV = new double[this.numX, this.numY, this.numZ];
             Fluid3D.auxW = new double[this.numX, this.numY, this.numZ];
-            for (int i = 0; i < numX; i++) //we want to have limits, so we put 0 in the borders an 1 inside the field
+            for (int i = 0; i < this.numX; i++) //we want to have limits, so we put 0 in the borders an 1 inside the field
             {
-                for (int j = 0; j < numY; j++)
+                for (int j = 0; j < this.numY; j++)
                 {
-                    for (int k = 0; k < numZ; k++)
+                    for (int k = 0; k < this.numZ; k++)
                     {
                         /*if (k == 0 || k == this.numX-1)
                         {
@@ -82,12 +96,12 @@ namespace DefaultNamespace
             }
 
             for (int i = 1;
-                 i < numX - 1;
+                 i < this.numX - 1;
                  i++) //we want to have limits, so we put 0 in the borders an 1 inside the field
             {
-                for (int j = 1; j < numY - 1; j++)
+                for (int j = 1; j < this.numY - 1; j++)
                 {
-                    for (int k = 1; k < numZ - 1; k++)
+                    for (int k = 1; k < this.numZ - 1; k++)
                     {
                         /*if (k == 0 || k == this.numX-1)
                         {
@@ -118,13 +132,27 @@ namespace DefaultNamespace
         {
             if (mode.Equals("y0"))
             {
-                for (int i = 0;
-                     i < numX;
+                for (int i = numX/2;
+                     i < numX/2+2;
                      i++) //we want to have limits, so we put 0 in the borders an 1 inside the field
+                {
+                    for (int k = numZ/2; k < numZ/2+2; k++)
+                    {
+                        v[i, 1, k] = speed;
+                        //smokeField[i, 1, k] = 0;
+                    }
+                }
+
+                /*s[numX / 2, numY / 2, numZ / 2]=0;
+                s[numX / 2-1, numY / 2, numZ / 2]=0;
+                s[numX / 2, numY / 2+1, numZ / 2]=0;
+                s[numX / 2-1, numY / 2+1, numZ / 2]=0;*/
+                for (int i = 0; i < numX; i++)
                 {
                     for (int k = 0; k < numZ; k++)
                     {
-                        v[i, 1, k] = speed;
+                        this.s[i, numY - 1, k] = 1;
+                        
                     }
                 }
             }
@@ -133,25 +161,82 @@ namespace DefaultNamespace
             }
             else if (mode.Equals("x0"))
             {
+                /*for (int i = numY/3;
+                     i < numY*2/3;
+                     i++) //we want to have limits, so we put 0 in the borders an 1 inside the field
+                {
+                    for (int k = numZ/3; k < numZ*2/3; k++)
+                    {
+                        u[1,i, k] = speed;
+                    }
+                }*/
+                u[1 , numY /2-1 , numZ /2-1 ] = speed;
+                u[1 , numY /2 , numZ /2-1 ] = speed;
+                u[1 , numY /2 -2, numZ /2-1 ] = speed;
+                s[numX/2 , numY /2-1 , numZ /2-1 ] = 0;
+                smokeField[1 , numY /2 -1, numZ /2-1] = 0;
+                smokeField[1, numY /2, numZ /2 -1] = 0;
+                smokeField[1 , numY /2 -2, numZ /2-1 ] = 0;
+                
+                for (int i = 0; i < numY; i++)
+                {
+                    for (int k = 0; k < numZ; k++)
+                    {
+                        s[numX-1,i, k] = 1;
+                    }
+                }
             }
-            else if (mode.Equals("x1"))
-            {
-            }
-            else if (mode.Equals("z0"))
-            {
-            }
-            else if (mode.Equals("z1"))
-            {
-            }
-
-            modifyVelocity(dt, -9.8);
-            forceIncomprensibility(500, dt);
+            
+            modifyVelocity(dt, 0);
+            forceIncomprensibility(300, dt);
             advection(dt);
             smoke(dt);
         }
+        
+         public void simulateGPU(double dt)
+        {
+            if (mode.Equals("y0"))
+            {
+                for (int i = numX/2;
+                     i < numX/2+2;
+                     i++) //we want to have limits, so we put 0 in the borders an 1 inside the field
+                {
+                    for (int k = numZ/2; k < numZ/2+2; k++)
+                    {
+                        if (s[i, 1, k] != 0)
+                        {
+                            v[i, 1, k] = speed;
+                            //smokeField[i, 1, k] = 0;
+                        }
+                        
+                    }
+                }
+
+                /*s[numX / 2, numY / 2, numZ / 2]=0;
+                s[numX / 2-1, numY / 2, numZ / 2]=0;
+                s[numX / 2, numY / 2+1, numZ / 2]=0;
+                s[numX / 2-1, numY / 2+1, numZ / 2]=0;*/
+                for (int i = 0; i < numX; i++)
+                {
+                    for (int k = 0; k < numZ; k++)
+                    {
+                        this.s[i, numY - 1, k] = 1;
+                        
+                    }
+                }
+            }
+            
+            modifyVelocity(dt, 0);
+            forceIncomprensibilityGPU(1000, dt);
+            advection(dt);
+            smoke(dt);
+        }
+        
 
         public void modifyVelocity(double dt, double aceleration)
         {
+           
+         
             //first we need to take into account the base values for the different vectors, adding the gravity to the v vector
             for (int i = 1; i < this.numX - 1; i++)
             {
@@ -164,6 +249,93 @@ namespace DefaultNamespace
                     }
                 }
             }
+      
+        }
+        
+        public void forceIncomprensibilityGPU(int iterations, double dt)
+        {
+            double[] auxU = new double[this.numX * this.numY * this.numZ],
+                auxV = new double[this.numX * this.numY * this.numZ],
+                auxW = new double[this.numX * this.numY * this.numZ],u = new double[this.numX * this.numY * this.numZ],
+                v = new double[this.numX * this.numY * this.numZ],
+                w = new double[this.numX * this.numY * this.numZ];
+            int[] s = new int[this.numX* this.numY*this.numZ];
+         
+            int l;
+            for (int i = 0; i < numX; i++)
+            {
+                for (int j = 0; j < numY; j++)
+                {
+                    for (int k = 0; k < numZ; k++)
+                    {
+                        u[i * numZ * numY + j * numZ + k] = this.u[i,j,k];
+                        v[i * numZ * numY + j * numZ + k] = this.v[i,j,k];
+                        w[i * numZ * numY + j * numZ + k] = this.w[i,j,k];
+                        s[i * numZ * numY + j * numZ + k] = this.s[i,j,k];
+                    }
+                }
+            }
+            
+            computeShader.SetInt("numX",this.numX);
+            computeShader.SetInt("numY",this.numY);
+            computeShader.SetInt("numZ",this.numZ);
+            
+            ComputeBuffer uComputeBuffer = new ComputeBuffer(u.Length,sizeof(double));
+            ComputeBuffer vComputeBuffer = new ComputeBuffer(v.Length,sizeof(double));
+            ComputeBuffer wComputeBuffer = new ComputeBuffer(w.Length,sizeof(double));
+            ComputeBuffer auxUComputeBuffer = new ComputeBuffer(auxU.Length,sizeof(double));
+            ComputeBuffer auxVComputeBuffer = new ComputeBuffer(auxV.Length,sizeof(double));
+            ComputeBuffer auxWComputeBuffer = new ComputeBuffer(auxW.Length,sizeof(double));
+            ComputeBuffer sComputeBuffer = new ComputeBuffer(s.Length,sizeof(int));
+            auxUComputeBuffer.SetData(auxU);
+            auxVComputeBuffer.SetData(auxV);
+            auxWComputeBuffer.SetData(auxW);
+            sComputeBuffer.SetData(s);
+            
+            computeShader.SetBuffer(0,"auxU",auxUComputeBuffer);
+            computeShader.SetBuffer(0,"auxV",auxVComputeBuffer);
+            computeShader.SetBuffer(0,"auxW",auxWComputeBuffer);
+            computeShader.SetBuffer(0,"s",sComputeBuffer);
+            
+            for (l = 0; (l < iterations); l++)
+            {
+                uComputeBuffer.SetData(u);
+                vComputeBuffer.SetData(v);
+                wComputeBuffer.SetData(w);
+                
+                computeShader.SetBuffer(0,"u",uComputeBuffer);
+                computeShader.SetBuffer(0,"v",vComputeBuffer);
+                computeShader.SetBuffer(0,"w",wComputeBuffer);
+                
+                computeShader.Dispatch(0,numX/10,numY/10,1);
+        
+                auxUComputeBuffer.GetData(u);
+                auxVComputeBuffer.GetData(v);
+                auxWComputeBuffer.GetData(w);
+
+            }
+            uComputeBuffer.Dispose();
+            vComputeBuffer.Dispose();
+            wComputeBuffer.Dispose();
+            auxUComputeBuffer.Dispose();
+            auxVComputeBuffer.Dispose();
+            auxWComputeBuffer.Dispose();
+            sComputeBuffer.Dispose();
+
+            for (int i = 0; i < numX; i++)
+            {
+                for (int j = 0; j < numY; j++)
+                {
+                    for (int k = 0; k < numZ; k++)
+                    {
+                        this.u[i, j, k] = u[i*numZ*numY+j*numZ+k];
+                        this.v[i,j,k] =v[i*numZ*numY+j*numZ+k];
+                         this.w[i,j,k] = w[i*numZ*numY+j*numZ+k];
+                    }
+                }
+            }
+            Debug.Log("iterations:"+ l);
+
         }
 
         class ThreadWorker
@@ -177,7 +349,7 @@ namespace DefaultNamespace
             private double dt;
             private Fluid3D fluid;
 
-            public ThreadWorker(int initiali, int finali, int initialj, int finalj, int initialk, int finalk, double dt,
+            public void SetParams(int initiali, int finali, int initialj, int finalj, int initialk, int finalk, double dt,
                 Fluid3D fluid)
             {
                 this.initiali = initiali;
@@ -294,7 +466,7 @@ namespace DefaultNamespace
                                                 Math.Abs((auxU[i, j, k] - this.u[i, j, k]) / auxU[i, j, k]) < error;*/
                                     Fluid3D.auxU[i + 1, j, k] =
                                         fluid.u[i + 1, j, k] - outflow * fluid.s[i + 1, j, k] / actualS;
-                                    /*converged = converged && Math.Abs((auxW[i, j, k+1] - this.w[i, j, k+1])/auxW[i, j, k+1]) < error;*/
+                                    /*converged = converged && Math.Abs((auxU[i+1, j, k] - this.u[i+1, j, k])/auxU[i+1, j, k]) < error;*/
 
                                     /*outflow *= overrelaxation;
                                     this.p[i, j, k] = p[i, j, k] + outflow / actualS * density * height / dt;*/
@@ -324,12 +496,11 @@ namespace DefaultNamespace
                                     outflow = fluid.u[i + 1, j, k] - fluid.u[i, j, k] + fluid.v[i, j + 1, k] -
                                         fluid.v[i, j, k] + fluid.w[i, j, k + 1] - fluid.w[i, j, k];
 
-                                    Fluid3D.auxV[i, j, k] =
-                                        fluid.v[i, j, k] + outflow * fluid.s[i - 1, j, k] / actualS;
+                                    Fluid3D.auxV[i, j, k] = fluid.v[i, j, k] + outflow * fluid.s[i, j - 1, k] / actualS;
                                     /*converged = converged &&
                                                 Math.Abs((auxU[i, j, k] - this.u[i, j, k]) / auxU[i, j, k]) < error;*/
-                                    Fluid3D.auxV[i + 1, j, k] =
-                                        fluid.v[i + 1, j, k] - outflow * fluid.s[i + 1, j, k] / actualS;
+                                    Fluid3D.auxV[i, j + 1, k] =
+                                        fluid.v[i, j + 1, k] - outflow * fluid.s[i, j + 1, k] / actualS;
                                     /*converged = converged && Math.Abs((auxW[i, j, k+1] - this.w[i, j, k+1])/auxW[i, j, k+1]) < error;*/
 
                                     /*outflow *= overrelaxation;
@@ -356,17 +527,15 @@ namespace DefaultNamespace
                                 actualS = fluid.s[i + 1, j, k] + fluid.s[i - 1, j, k] + fluid.s[i, j + 1, k] +
                                           fluid.s[i, j - 1, k] + fluid.s[i, j, k - 1] + fluid.s[i, j, k + 1];
                                 if (actualS != 0)
-                                {
+                                { 
                                     outflow = fluid.u[i + 1, j, k] - fluid.u[i, j, k] + fluid.v[i, j + 1, k] -
                                         fluid.v[i, j, k] + fluid.w[i, j, k + 1] - fluid.w[i, j, k];
 
-                                    Fluid3D.auxW[i, j, k] =
-                                        fluid.w[i, j, k] + outflow * fluid.s[i - 1, j, k] / actualS;
-                                    /*converged = converged &&
-                                                Math.Abs((auxU[i, j, k] - this.u[i, j, k]) / auxU[i, j, k]) < error;*/
-                                    Fluid3D.auxU[i + 1, j, k] =
-                                        fluid.w[i + 1, j, k] - outflow * fluid.s[i + 1, j, k] / actualS;
-                                    /*converged = converged && Math.Abs((auxW[i, j, k+1] - this.w[i, j, k+1])/auxW[i, j, k+1]) < error;*/
+                                   
+                                    Fluid3D.auxW[i, j, k] = fluid.w[i, j, k] + outflow * fluid.s[i, j, k - 1] / actualS;
+                                 
+                                    Fluid3D.auxW[i, j, k + 1] =
+                                        fluid.w[i, j, k + 1] - outflow * fluid.s[i, j, k + 1] / actualS;
 
                                     /*outflow *= overrelaxation;
                                     this.p[i, j, k] = p[i, j, k] + outflow / actualS * density * height / dt;*/
@@ -419,76 +588,73 @@ namespace DefaultNamespace
             int actualS = 0;
             double[,,] auxU = new double[this.numX, this.numY, this.numZ],
                 auxV = new double[this.numX, this.numY, this.numZ],
-                auxW = new double[this.numX, this.numY, this.numZ];
+                auxW = new double[this.numX, this.numY, this.numZ],
+                outflowMat = new double[this.numX, this.numY, this.numZ];
             bool converged = false;
-            double error = 1;
+            double error = 0.0001;
             int l = 0;
           
-
-            for (l = 0; (l < iterations ); l++)
+            List<Thread> threads = new List<Thread>();
+            ThreadWorker tw = new ThreadWorker();
+            tw.SetParams(1, this.numX -1, 1, this.numY -1,
+                1, this.numZ - 1, dt,
+                this);
+            double outflowAvg = 0;
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            for (l = 0; (l < iterations && !converged); l++)
             {
-                /*List<Thread> threads = new List<Thread>();
-                ThreadWorker tw1 = new ThreadWorker(1, this.numX / 2, 1, this.numY / 2,
-                    1, this.numZ - 1, dt,
-                    this);
-                Thread t1 = new Thread(new ThreadStart(tw1.ThreadGaussSiedelForU));
+                /*Thread t1 = new Thread(new ThreadStart(tw.ThreadGaussSiedelForU));
                 t1.Start();
                 threads.Add(t1);
-                ThreadWorker tw2 = new ThreadWorker(this.numX / 2, this.numX - 1, 1, this.numY / 2,
-                    1, this.numZ - 1, dt,
-                    this);
-                Thread t2 = new Thread(new ThreadStart(tw2.ThreadGaussSiedelForV));
+                Thread t2 = new Thread(new ThreadStart(tw.ThreadGaussSiedelForV));
                 t2.Start();
                 threads.Add(t2);
-                ThreadWorker tw3 = new ThreadWorker(1, this.numX / 2, this.numY / 2, this.numY - 1,
-                    1, this.numZ - 1, dt, 
-                    this);
-                Thread t3 = new Thread(new ThreadStart(tw3.ThreadGaussSiedelForW));
+                Thread t3 = new Thread(new ThreadStart(tw.ThreadGaussSiedelForW));
                 t3.Start();
-                threads.Add(t3);
-                */
+                threads.Add(t3);*/
+                
                 
 
                 /*
-                ThreadWorker tw1 = new ThreadWorker(1, this.numX / 2, 1, this.numY / 2,
+                tw.SetParams(1, this.numX /4, 1, this.numY -1,
                     1, this.numZ - 1, dt,
                     this);
-                Thread t1 = new Thread(new ThreadStart(tw1.ThreadGaussSiedel));
+                Thread t1 = new Thread(new ThreadStart(tw.ThreadGaussSiedel));
                 t1.Start();
                 threads.Add(t1);
-                ThreadWorker tw2 = new ThreadWorker(this.numX / 2, this.numX - 1, 1, this.numY / 2,
+                tw.SetParams(this.numX / 4, this.numX /2, 1, this.numY -1,
                     1, this.numZ - 1, dt,
                     this);
-                Thread t2 = new Thread(new ThreadStart(tw2.ThreadGaussSiedel));
+                Thread t2 = new Thread(new ThreadStart(tw.ThreadGaussSiedel));
                 t2.Start();
                 threads.Add(t2);
-                ThreadWorker tw3 = new ThreadWorker(1, this.numX / 2, this.numY / 2, this.numY - 1,
+                tw.SetParams(this.numX / 2,3*this.numX/4, 1, this.numY - 1,
                     1, this.numZ - 1, dt, 
                     this);
-                Thread t3 = new Thread(new ThreadStart(tw3.ThreadGaussSiedel));
+                Thread t3 = new Thread(new ThreadStart(tw.ThreadGaussSiedel));
                 t3.Start();
                 threads.Add(t3);
-                ThreadWorker tw4 = new ThreadWorker(this.numX / 2, this.numX - 1, this.numY / 2, this.numY - 1,
+                tw.SetParams(3*this.numX/4, this.numX - 1, 1, this.numY - 1,
                     1, this.numZ - 1, dt,
                     this);
-                Thread t4 = new Thread(new ThreadStart(tw4.ThreadGaussSiedel));
+                Thread t4 = new Thread(new ThreadStart(tw.ThreadGaussSiedel));
                 t4.Start();
                 threads.Add(t4);
-
-                */
-                /*
-                for (int i = 0; i < 3; i++)
+                for (int i = 0; i < 4; i++)
                 {
                     threads[i].Join();
+                    
                 }
-                */
+                threads.Clear();*/
                
-                /*converged = true;*/
-                for (int i = 1; i < this.numX - 1; i++)
+                converged = true;
+                outflowAvg = 0;
+                for (int i = 1; i < this.numX -1; i++)
                 {
-                    for (int j = 1; j < this.numY - 1; j++)
+                    for (int j = 1; j < this.numY -1; j++)
                     {
-                        for (int k = 1; k < this.numZ - 1; k++)
+                        for (int k = 1; k < this.numZ -1; k++)
                         {
                             if (this.s[i, j, k] != 0)
                             {
@@ -498,75 +664,138 @@ namespace DefaultNamespace
                                 {
                                     outflow = this.u[i + 1, j, k] - this.u[i, j, k] + this.v[i, j + 1, k] -
                                         this.v[i, j, k] + this.w[i, j, k + 1] - this.w[i, j, k];
+                                    
+                                    outflow *= overrelaxation;  
 
-                                    auxU[i, j, k] = this.u[i, j, k] + outflow * this.s[i - 1, j, k] / actualS;
-                                    /*converged = converged &&
-                                                Math.Abs((auxU[i, j, k] - this.u[i, j, k]) / auxU[i, j, k]) < error;*/
-                                    auxU[i + 1, j, k] =
+                                    u[i, j, k] = this.u[i, j, k] + outflow * this.s[i - 1, j, k] / actualS;
+                                    
+                                    u[i + 1, j, k] =
                                         this.u[i + 1, j, k] - outflow * this.s[i + 1, j, k] / actualS;
                                     /*converged = converged && Math.Abs((auxU[i+1, j, k] - this.u[i+1, j, k])/auxU[i+1, j, k]) < error;*/
-                                    auxV[i, j, k] = this.v[i, j, k] + outflow * this.s[i, j - 1, k] / actualS;
+                                    v[i, j, k] = this.v[i, j, k] + outflow * this.s[i, j - 1, k] / actualS;
                                     /*converged = converged && Math.Abs((auxV[i, j, k] - this.v[i, j, k])/auxV[i, j, k]) < error;*/
-                                    auxV[i, j + 1, k] =
+                                    v[i, j + 1, k] =
                                         this.v[i, j + 1, k] - outflow * this.s[i, j + 1, k] / actualS;
                                     /*converged = converged && Math.Abs((auxV[i, j+1, k] - this.v[i, j+1, k])/auxV[i, j+1, k]) < error;*/
-                                    auxW[i, j, k] = this.w[i, j, k] + outflow * this.s[i, j, k - 1] / actualS;
+                                    w[i, j, k] = this.w[i, j, k] + outflow * this.s[i, j, k - 1] / actualS;
                                     /*converged = converged && Math.Abs((auxW[i, j, k] - this.w[i, j, k])/auxW[i, j, k]) < error;*/
-                                    auxW[i, j, k + 1] =
+                                    w[i, j, k + 1] =
                                         this.w[i, j, k + 1] - outflow * this.s[i, j, k + 1] / actualS;
                                     /*converged = converged && Math.Abs((auxW[i, j, k+1] - this.w[i, j, k+1])/auxW[i, j, k+1]) < error;*/
 
-                                    /*outflow *= overrelaxation;
-                                    this.p[i, j, k] = p[i, j, k] + outflow / actualS * density * height / dt;*/
+                                    
+                                    converged = converged && Math.Abs(outflowMat[i, j, k] - outflow) < error;
+                                    outflowMat[i, j, k] = outflow;
+                                    outflowAvg += outflow;
+                                    /*this.p[i, j, k] = p[i, j, k] + outflow / actualS * density * height / dt;*/
                                 }
                             }
                         }
                     }
                 }
-                u = auxU;
+                /*Debug.Log("Error:"+ outflowAvg/numX*numY*numZ); */
+                /*u = auxU;
                 v = auxV;
-                w = auxW;
+                w = auxW;*/
+                /*tw.SetParams(1, this.numX -1, 1, this.numY -1,
+                    1, this.numZ - 1, dt,
+                    this);*/
               
             }
-            Debug.Log("n iteraciones = " + l);
+            //Debug.Log("iterations:"+ l); 
+            sw.Stop();  
+            Debug.Log("Incompressibility "+ sw.Elapsed.ToString("hh\\:mm\\:ss\\.fff")); 
+            
 
-            for (int k = 0; k < this.numZ - 1; k++)
+            /*for (int i = 0; i < this.numX; i++)
             {
-                if (k == 0)
-                {
-                    for (int i = 1; i < this.numX - 1; i++)
-                    {
-                        for (var j = 1; j < this.numY - 1; j++)
-                        {
-                            this.w[i, j, k] = this.w[i, j, k + 1];
-                        }
-                    }
-                }
-                else if (k == this.numZ - 1)
-                {
-                    for (int i = 1; i < this.numX - 1; i++)
-                    {
-                        for (var j = 1; j < this.numY - 1; j++)
-                        {
-                            this.w[i, j, k] = this.w[i, j, k - 1];
-                        }
-                    }
-                }
-                else
-                {
-                    for (int i = 0; i < this.numX; i++)
-                    {
-                        this.u[i, 0, 0] = this.u[i, 1, k];
-                        this.u[i, this.numY - 1, k] = this.u[i, this.numY - 2, k];
-                    }
 
-                    for (var j = 0; j < this.numY; j++)
+                for (var j = 0; j < this.numY; j++)
+                {
+                    
+                    for (int k = 0; k < this.numZ; k++)
                     {
-                        this.v[0, j, k] = this.v[1, j, k];
-                        this.v[this.numX - 1, j, k] = this.v[this.numX - 2, j, k];
+                        if (i == 0)
+                        {
+                            this.v[i, j, k] = this.v[i+1, j, k];
+                            this.w[i, j, k] = this.w[i+1, j, k];
+                        }
+                        if (i == numX - 1)
+                        {
+                            this.v[i, j, k] = this.v[i-1, j, k];
+                            this.w[i, j, k] = this.w[i-1, j, k];
+                        }
+                        if (j == 0)
+                        {
+                            this.u[i, j, k] = this.u[i, j+1, k];
+                            this.w[i, j, k] = this.w[i, j+1, k];
+                        }
+                        if (j == numY - 1)
+                        {
+                            
+                            this.u[i, j, k] = this.u[i, j-1, k];
+                            this.w[i, j, k] = this.w[i, j-1, k];
+                        }
+                        if (k == 0)
+                        {
+                            this.v[i, j, k] = this.v[i, j, k+1];
+                            this.u[i, j, k] = this.u[i, j, k+1];
+                            
+                        }
+                        if (k == numZ - 1)
+                        {
+                            this.v[i, j, k] = this.v[i, j, k-1];
+                            this.u[i, j, k] = this.u[i, j, k-1];
+                            
+                        }
+                        
+                     
                     }
+                }
+            }*/
+            // Recorrer el borde superior de la matriz
+            for (int j = 0; j < this.numY; j++)
+            {
+                for (int k = 0; k < this.numZ; k++)
+                {
+                    this.v[0, j, k] = this.v[1, j, k];
+                    this.w[0, j, k] = this.w[1, j, k];
+                    this.v[numX-1, j, k] = this.v[numX-2, j, k];
+                    this.w[numX-1, j, k] = this.w[numX-2, j, k];
+                    
                 }
             }
+
+
+// Recorrer el borde izquierdo de la matriz
+            for (int i = 0; i < this.numX; i++)
+            {
+                for (int k = 0; k < this.numZ; k++)
+                {
+                    this.u[i, 0, k] = this.u[i, 1, k];
+                    this.w[i, 0, k] = this.w[i, 1, k];
+                    this.u[i, numY-1, k] = this.u[i, numY-2, k];
+                    this.w[i, numY-1, k] = this.w[i, numY-2, k];
+                }
+            }
+
+
+
+// Recorrer el borde delantero de la matriz
+            for (int i = 0; i < this.numX; i++)
+            {
+                for (int j = 0; j < this.numY; j++)
+                {
+                    this.u[i, j, 0] = this.u[i, j, 1];
+                    this.v[i, j, 0] = this.v[i, j, 1];
+                    this.u[i, j, numZ-1] = u[i, j, numZ-2];
+                    this.v[i, j, numZ-1] = v[i, j, numZ-2];
+                }
+            }
+         
+
+
+            
         }
 
         public void advection(double dt)
@@ -580,6 +809,8 @@ namespace DefaultNamespace
             double[,,] auxv = new double[this.numX, this.numY, this.numZ];
             double[,,] auxw = new double[this.numX, this.numY, this.numZ];
             double b000, b001, b010, b011, b100, b101;
+           
+            
             for (int i = 1; i < this.numX - 1; i++)
             {
                 for (int j = 1; j < this.numY - 1; j++)
@@ -587,7 +818,7 @@ namespace DefaultNamespace
                     for (int k = 1; k < this.numZ - 1; k++)
                     {
                         //u
-                        if (this.s[i, j, k] != 0.0 && this.s[i - 1, j, k] != 0.0)
+                        if (this.s[i, j, k] != 0.0)
                         {
                             u = this.u[i, j, k];
                             v = (this.v[i, j, k] + this.v[i - 1, j, k] +
@@ -630,7 +861,7 @@ namespace DefaultNamespace
                             auxu[i, j, k] = this.u[i0, j0, k0] * b000 * b100 * b010 +
                                             this.u[i1, j0, k0] * b001 * b100 * b010 +
                                             this.u[i1, j0, k1] * b001 * b101 * b010 +
-                                            this.u[i1, j0, k1] * b000 * b101 * b010
+                                            this.u[i0, j0, k1] * b000 * b101 * b010
                                             + this.u[i0, j1, k0] * b000 * b100 * b011 +
                                             this.u[i1, j1, k0] * b001 * b100 * b011
                                             + this.u[i0, j1, k1] * b000 * b101 * b011 +
@@ -639,7 +870,7 @@ namespace DefaultNamespace
 
 
                         //v
-                        if (this.s[i, j, k] != 0.0 && this.s[i, j - 1, k] != 0.0)
+                        if (this.s[i, j, k] != 0.0)
                         {
                             v = this.v[i, j, k];
                             u = (this.u[i, j - 1, k] + this.u[i, j, k] +
@@ -682,7 +913,7 @@ namespace DefaultNamespace
                             auxv[i, j, k] = this.v[i0, j0, k0] * b000 * b100 * b010 +
                                             this.v[i1, j0, k0] * b001 * b100 * b010 +
                                             this.v[i1, j0, k1] * b001 * b101 * b010 +
-                                            this.v[i1, j0, k1] * b000 * b101 * b010
+                                            this.v[i0, j0, k1] * b000 * b101 * b010
                                             + this.v[i0, j1, k0] * b000 * b100 * b011 +
                                             this.v[i1, j1, k0] * b001 * b100 * b011
                                             + this.v[i0, j1, k1] * b000 * b101 * b011 +
@@ -690,7 +921,7 @@ namespace DefaultNamespace
                         }
 
                         //w
-                        if (this.s[i, j, k] != 0.0 && this.s[i, j, k - 1] != 0.0)
+                        if (this.s[i, j, k] != 0.0)
                         {
                             v = (this.v[i, j, k] + this.v[i, j, k - 1] +
                                  this.v[i, j + 1, k] + this.v[i, j + 1, k - 1]) / 4;
@@ -734,7 +965,7 @@ namespace DefaultNamespace
                             auxw[i, j, k] = this.w[i0, j0, k0] * b000 * b100 * b010 +
                                             this.w[i1, j0, k0] * b001 * b100 * b010 +
                                             this.w[i1, j0, k1] * b001 * b101 * b010 +
-                                            this.w[i1, j0, k1] * b000 * b101 * b010
+                                            this.w[i0, j0, k1] * b000 * b101 * b010
                                             + this.w[i0, j1, k0] * b000 * b100 * b011 +
                                             this.w[i1, j1, k0] * b001 * b100 * b011
                                             + this.w[i0, j1, k1] * b000 * b101 * b011 +
@@ -1122,6 +1353,8 @@ namespace DefaultNamespace
             this.v = auxv;
             this.u = auxu;
             this.w = auxw;
+         
+            
         }
 
         public void smoke(double dt)
@@ -1132,11 +1365,12 @@ namespace DefaultNamespace
             int cell0y;
             int cell0z;
             double[,,] auxSmokeField = new double[this.numX, this.numY, this.numZ];
-            for (int i = 1; i < this.numX - 1; i++)
+           
+            for (int i = 1; i < this.numX-1; i++)
             {
-                for (int j = 1; j < this.numY - 1; j++)
+                for (int j = 1; j < this.numY-1; j++)
                 {
-                    for (int k = 1; k < this.numZ - 1; k++)
+                    for (int k = 1; k < this.numZ-1; k++)
                     {
                         if (this.s[i, j, k] != 0)
                         {
@@ -1163,27 +1397,25 @@ namespace DefaultNamespace
                             double b100 = 1 - b101;
                             int cell1y = Math.Min(cell0y + 1, this.numY - 1);
                             int cell1x = Math.Min(cell0x + 1, this.numX - 1);
-                            int cell1z = Math.Min(cell0x + 1, this.numZ - 1);
-                            /*Debug.Log("x: " + cell0x + "," + cell1x + "y: " + cell0y + "," + cell1y + "z: " +
-                                      cell0z +
-                                      "," + cell1z);*/
+                            int cell1z = Math.Min(cell0z + 1, this.numZ - 1);
+                            /*Debug.Log("before: " +  smokeField[i,j,k]);*/
                             auxSmokeField[i, j, k] = b000 * b100 * b010 * this.smokeField[cell0x, cell0y, cell0z] +
                                                      b001 * b010 * b100 * this.smokeField[cell1x, cell0y, cell0z]
-                                                     + b001 * b010 * b101 *
-                                                     this.smokeField[cell1x, cell0y, cell1z] +
+                                                     + b001 * b010 * b101 * this.smokeField[cell1x, cell0y, cell1z] +
                                                      b000 * b010 * b101 * this.smokeField[cell0x, cell0y, cell1z]
-                                                     + b000 * b011 * b100 *
-                                                     this.smokeField[cell0x, cell1y, cell0z] +
+                                                     + b000 * b011 * b100 * this.smokeField[cell0x, cell1y, cell0z] +
                                                      b001 * b011 * b100 * this.smokeField[cell1x, cell1y, cell0z]
-                                                     + b001 * b011 * b101 *
-                                                     this.smokeField[cell0x, cell1y, cell1z] +
+                                                     + b000 * b011 * b101 * this.smokeField[cell0x, cell1y, cell1z] +
                                                      b001 * b011 * b101 * this.smokeField[cell1x, cell1y, cell1z];
+                            /*Debug.Log("after: " +  smokeField[i,j,k]);*/
                         }
                     }
                 }
             }
-
+    
             this.smokeField = auxSmokeField;
-        }
+           
+        }        
     }
+    
 }

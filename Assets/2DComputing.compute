@@ -1,0 +1,55 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel Incomprenssibility
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWTexture2D<float4> Result;
+
+
+RWStructuredBuffer<double> u;
+RWStructuredBuffer<double> v;
+RWStructuredBuffer<double> auxU;
+RWStructuredBuffer<double> auxV;
+RWStructuredBuffer<int> s;
+
+
+int numY;
+
+int numX;
+
+
+[numthreads(10,10,1)]
+void Incomprenssibility (uint3 id : SV_DispatchThreadID)
+{
+    int i = id.x;
+    int j = id.y;
+    double outflow = 0;
+    int actualS = 0;
+    double overrelaxation = 1.99;
+    if(i < numX-1 && i >  0 && j < numY-1 && j > 0)
+    {
+        if (s[i*numY+ j] != 0)
+        {
+            actualS = s[(i + 1)*numY+ j] + s[(i - 1)*numY+ j] + s[i*numY+ j + 1] +
+                      s[i*numY+ j - 1];
+            if (actualS != 0)
+            {
+           
+            
+                outflow = u[(i + 1)*numY+ j] - u[i*numY+ j] + v[i*numY+ j + 1] -
+                          v[i*numY+ j];
+                outflow*=overrelaxation;
+
+                auxU[i*numY+ j] = u[i *numY+ j] + outflow * s[(i - 1)*numY+ j] / actualS;
+                auxU[(i + 1)*numY+ j] =
+                    u[(i + 1)*numY+ j] - outflow * s[(i + 1)*numY+ j] / actualS;
+            
+                auxV[i*numY+ j] = v[i*numY+ j] + outflow * s[i*numY+ j - 1] / actualS;
+                auxV[i*numY+ j + 1] =
+                    v[i*numY+ j + 1] - outflow * s[i*numY+ j + 1] / actualS;
+
+            }
+        }
+    }
+    
+}

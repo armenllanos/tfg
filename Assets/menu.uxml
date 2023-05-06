@@ -1,0 +1,364 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/menu.uss?fileID=7433441132597879392&amp;guid=8bd9302079b373f4183245cac4a744fd&amp;type=3#menu" />
+    <ui:VisualElement name="contenedor" class="contenedor">
+        <ui:VisualElement name="izquierda" class="izquierda" style="justify-content: space-between;">
+            <ui:VisualElement name="logo" class="logo">
+                <ui:Label text="DIGITAL TWIN" display-tooltip-when-elided="true" class="titulo" style="white-space: normal; -unity-text-align: middle-center; color: rgb(255, 255, 255); -unity-text-outline-color: rgb(248, 247, 247);" />
+            </ui:VisualElement>
+            <ui:VisualElement name="botones" class="botones">
+                <ui:VisualElement name="arriba" style="height: 80%;">
+                    <ui:Label text="Numero Ventiladores" display-tooltip-when-elided="true" name="Ventiladores" style="font-size: 35px; color: rgb(253, 253, 253); -unity-text-outline-color: rgb(255, 255, 255);" />
+                    <ui:Label text="X" display-tooltip-when-elided="true" name="X" style="color: rgb(250, 247, 247);" />
+                    <ui:SliderInt picking-mode="Ignore" label="SliderInt" value="42" high-value="8" name="SliderNumberFansX" low-value="1" style="font-size: 1px; color: rgb(5, 0, 0); margin-left: 3px; height: 15%; flex-direction: column;" />
+                    <ui:Label text="0" display-tooltip-when-elided="true" name="numberFansX" enable-rich-text="false" style="font-size: 25px; -unity-text-outline-color: rgb(250, 249, 249); color: rgb(250, 249, 249);" />
+                    <ui:Label text="Y" display-tooltip-when-elided="true" name="Y" style="color: rgb(248, 242, 242);" />
+                    <ui:SliderInt picking-mode="Ignore" label="SliderInt" value="42" high-value="8" name="SliderNumberFansY" low-value="1" style="font-size: 1px; color: rgb(5, 0, 0); margin-left: 3px; height: 15%; flex-direction: column;" />
+                    <ui:Label text="0" display-tooltip-when-elided="true" name="numberFansY" enable-rich-text="false" style="font-size: 25px; color: rgb(255, 255, 255); -unity-text-outline-color: rgb(255, 255, 255);" />
+                </ui:VisualElement>
+                <ui:VisualElement name="abajo" class="abajo" style="margin-right: 10px;">
+                    <ui:Button text="Start" display-tooltip-when-elided="true" name="startButton" class="boton" style="color: rgb(250, 250, 250); -unity-text-outline-color: rgb(253, 253, 253);" />
+                    <ui:Button text="Configure" display-tooltip-when-elided="true" name="configureButton" class="boton" style="color: rgba(255, 251, 251, 255);" />
+                    <ui:Button text="Pressure" display-tooltip-when-elided="true" name="showPressure" class="boton" style="color: rgba(255, 251, 251, 255);" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="datos" style="width: 100%; height: 20%;">
+                <ui:VisualElement name="totalThrust" style="height: 50%; align-items: center; justify-content: space-around; flex-direction: row; margin-bottom: 10px; border-left-color: rgb(219, 212, 212); border-right-color: rgb(219, 212, 212); border-top-color: rgb(219, 212, 212); border-bottom-color: rgb(219, 212, 212); border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 2px; background-color: rgb(70, 70, 70);">
+                    <ui:Label text="Thrust" display-tooltip-when-elided="true" style="-unity-text-outline-color: rgb(243, 237, 237); color: rgb(255, 255, 255);" />
+                    <ui:Label text="0" display-tooltip-when-elided="true" name="thrust" style="-unity-text-outline-color: rgb(255, 255, 255); color: rgb(245, 240, 240);" />
+                </ui:VisualElement>
+                <ui:VisualElement name="totalPower" style="height: 50%; flex-direction: row; align-items: center; justify-content: space-around; border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 2px; border-left-color: rgb(250, 244, 244); border-right-color: rgb(250, 244, 244); border-top-color: rgb(250, 244, 244); border-bottom-color: rgb(250, 244, 244); background-color: rgb(99, 97, 97); min-width: auto; min-height: auto; margin-bottom: 10px;">
+                    <ui:Label text="Power" display-tooltip-when-elided="true" style="color: rgb(255, 255, 255); -unity-text-outline-color: rgb(255, 255, 255);" />
+                    <ui:Label text="0" display-tooltip-when-elided="true" name="power" style="color: rgb(253, 249, 249);" />
+                </ui:VisualElement>
+                <ui:VisualElement name="frames" style="height: 50%; align-items: center; justify-content: space-around; flex-direction: row; color: rgb(243, 237, 237); background-color: rgb(147, 146, 146); border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 2px; border-left-color: rgb(233, 228, 228); border-right-color: rgb(233, 228, 228); border-top-color: rgb(233, 228, 228); border-bottom-color: rgb(233, 228, 228);">
+                    <ui:Label text="FPS" display-tooltip-when-elided="true" style="flex-direction: row;" />
+                    <ui:Label text="0" display-tooltip-when-elided="true" name="fps" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="centro" style="width: 90%; min-width: 61%; color: rgba(210, 210, 210, 0); background-color: rgba(142, 140, 140, 0.21);">
+            <ui:VisualElement name="fanButtons" style="height: 80%; flex-direction: row;">
+                <ui:VisualElement style="width: 6%;">
+                    <ui:Button text="Select" display-tooltip-when-elided="true" name="selectButton" class="fanButton" style="width: 100%; font-size: 20px; color: rgba(255, 251, 251, 255);" />
+                </ui:VisualElement>
+                <ui:VisualElement name="fanColumn1" class="fanColumn" style="flex-direction: column; width: 6%; height: 100%;">
+                    <ui:Button display-tooltip-when-elided="true" name="fan1" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan2" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan3" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan4" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan5" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan6" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan7" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan8" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan9" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan10" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan11" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan12" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan13" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan14" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan15" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan16" class="fanButton" style="flex-direction: row; width: 100%;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="fanColumn2" class="fanColumn" style="flex-direction: column; width: 6%; height: 100%;">
+                    <ui:Button display-tooltip-when-elided="true" name="fan1" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan2" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan3" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan4" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan5" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan6" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan7" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan8" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan9" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan10" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan11" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan12" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan13" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan14" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan15" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan16" class="fanButton" style="flex-direction: row; width: 100%;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="fanColumn3" class="fanColumn" style="flex-direction: column; width: 6%; height: 100%;">
+                    <ui:Button display-tooltip-when-elided="true" name="fan1" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan2" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan3" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan4" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan5" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan6" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan7" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan8" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan9" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan10" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan11" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan12" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan13" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan14" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan15" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan16" class="fanButton" style="flex-direction: row; width: 100%;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="fanColumn4" class="fanColumn" style="flex-direction: column; width: 6%; height: 100%;">
+                    <ui:Button display-tooltip-when-elided="true" name="fan1" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan2" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan3" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan4" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan5" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan6" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan7" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan8" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan9" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan10" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan11" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan12" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan13" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan14" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan15" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan16" class="fanButton" style="flex-direction: row; width: 100%;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="fanColumn5" style="flex-direction: column; width: 6%; height: 100%;">
+                    <ui:Button display-tooltip-when-elided="true" name="fan1" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan2" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan3" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan4" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan5" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan6" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan7" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan8" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan9" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan10" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan11" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan12" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan13" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan14" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan15" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan16" class="fanButton" style="flex-direction: row; width: 100%;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="fanColumn6" class="fanColumn" style="flex-direction: column; width: 6%; height: 100%;">
+                    <ui:Button display-tooltip-when-elided="true" name="fan1" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan2" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan3" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan4" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan5" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan6" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan7" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan8" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan9" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan10" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan11" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan12" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan13" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan14" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan15" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan16" class="fanButton" style="flex-direction: row; width: 100%;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="fanColumn7" class="fanColumn" style="flex-direction: column; width: 6%; height: 100%;">
+                    <ui:Button display-tooltip-when-elided="true" name="fan1" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan2" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan3" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan4" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan5" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan6" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan7" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan8" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan9" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan10" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan11" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan12" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan13" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan14" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan15" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan16" class="fanButton" style="flex-direction: row; width: 100%;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="fanColumn8" class="fanColumn" style="flex-direction: column; width: 6%; height: 100%;">
+                    <ui:Button display-tooltip-when-elided="true" name="fan1" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan2" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan3" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan4" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan5" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan6" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan7" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan8" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan9" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan10" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan11" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan12" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan13" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan14" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan15" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan16" class="fanButton" style="flex-direction: row; width: 100%;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="fanColumn9" class="fanColumn" style="flex-direction: column; width: 6%; height: 100%;">
+                    <ui:Button display-tooltip-when-elided="true" name="fan1" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan2" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan3" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan4" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan5" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan6" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan7" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan8" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan9" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan10" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan11" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan12" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan13" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan14" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan15" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan16" class="fanButton" style="flex-direction: row; width: 100%;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="fanColumn10" class="fanColumn" style="flex-direction: column; width: 6%; height: 100%;">
+                    <ui:Button display-tooltip-when-elided="true" name="fan1" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan2" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan3" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan4" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan5" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan6" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan7" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan8" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan9" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan10" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan11" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan12" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan13" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan14" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan15" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan16" class="fanButton" style="flex-direction: row; width: 100%;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="fanColumn11" class="fanColumn" style="flex-direction: column; width: 6%; height: 100%;">
+                    <ui:Button display-tooltip-when-elided="true" name="fan1" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan2" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan3" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan4" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan5" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan6" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan7" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan8" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan9" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan10" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan11" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan12" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan13" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan14" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan15" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan16" class="fanButton" style="flex-direction: row; width: 100%;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="fanColumn12" class="fanColumn" style="flex-direction: column; width: 6%; height: 100%;">
+                    <ui:Button display-tooltip-when-elided="true" name="fan1" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan2" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan3" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan4" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan5" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan6" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan7" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan8" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan9" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan10" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan11" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan12" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan13" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan14" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan15" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan16" class="fanButton" style="flex-direction: row; width: 100%;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="fanColumn13" class="fanColumn" style="flex-direction: column; width: 6%; height: 100%;">
+                    <ui:Button display-tooltip-when-elided="true" name="fan1" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan2" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan3" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan4" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan5" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan6" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan7" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan8" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan9" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan10" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan11" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan12" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan13" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan14" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan15" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan16" class="fanButton" style="flex-direction: row; width: 100%;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="fanColumn14" class="fanColumn" style="flex-direction: column; width: 6%; height: 100%;">
+                    <ui:Button display-tooltip-when-elided="true" name="fan1" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan2" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan3" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan4" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan5" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan6" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan7" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan8" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan9" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan10" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan11" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan12" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan13" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan14" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan15" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan16" class="fanButton" style="flex-direction: row; width: 100%;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="fanColumn15" class="fanColumn" style="flex-direction: column; width: 6%; height: 100%;">
+                    <ui:Button display-tooltip-when-elided="true" name="fan1" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan2" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan3" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan4" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan5" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan6" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan7" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan8" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan9" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan10" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan11" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan12" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan13" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan14" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan15" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan16" class="fanButton" style="flex-direction: row; width: 100%;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="fanColumn16" class="fanColumn" style="flex-direction: column; width: 6%; height: 100%;">
+                    <ui:Button display-tooltip-when-elided="true" name="fan1" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan2" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan3" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan4" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan5" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan6" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan7" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan8" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan9" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan10" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan11" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan12" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan13" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan14" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan15" class="fanButton" style="flex-direction: row; width: 100%;" />
+                    <ui:Button display-tooltip-when-elided="true" name="fan16" class="fanButton" style="flex-direction: row; width: 100%;" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="fanInfo" style="height: 20%; justify-content: center; align-items: center; flex-direction: column;">
+                <ui:VisualElement style="align-items: center; width: 100%; height: 100%;">
+                    <ui:VisualElement name="FanNumber" style="flex-direction: row; align-items: stretch; justify-content: flex-start; height: 20%; width: 100%; background-color: rgb(91, 91, 91);">
+                        <ui:Label text="NºVENTILADOR" display-tooltip-when-elided="true" name="number" style="height: 100%; width: 100%; font-size: 39%; -unity-text-outline-color: rgb(243, 243, 243); color: rgb(248, 240, 240);" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="VisualElement" style="flex-direction: column; align-items: stretch; justify-content: flex-start; height: 25%; width: 100%; background-color: rgb(91, 91, 91); border-left-color: rgb(142, 142, 142); border-right-color: rgb(142, 142, 142); border-top-color: rgb(142, 142, 142); border-bottom-color: rgb(142, 142, 142); border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 2px;">
+                        <ui:SliderInt picking-mode="Ignore" label="%Velocidad" value="42" high-value="100" name="VelocityPercentaje" style="width: 100%; background-color: rgb(77, 77, 77); height: 50%;" />
+                        <ui:Label text="0" display-tooltip-when-elided="true" name="ShowPercentaje" style="height: 50%; align-items: flex-end; justify-content: center;" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="VisualElement" style="flex-direction: row; align-items: stretch; justify-content: flex-start; height: 50%; width: 100%; background-color: rgb(91, 91, 91); top: 2%; flex-shrink: 0; flex-wrap: wrap;">
+                        <ui:VisualElement style="width: 50%; flex-shrink: 1; flex-direction: row; height: 50%; justify-content: flex-start; border-left-color: rgb(154, 154, 154); border-right-color: rgb(154, 154, 154); border-top-color: rgb(154, 154, 154); border-bottom-color: rgb(154, 154, 154); border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 2px;">
+                            <ui:Label text="Velocidad" display-tooltip-when-elided="true" name="Label" style="width: 50%; justify-content: space-between; height: 30%; top: 30%; background-color: rgb(120, 120, 120); flex-direction: row; -unity-text-align: upper-center; color: rgb(248, 244, 244); -unity-text-outline-color: rgb(255, 255, 255);" />
+                            <ui:Label text="Label" display-tooltip-when-elided="true" name="Velocity" style="flex-direction: column; height: 30%; width: 50%; top: 30%; justify-content: flex-end; background-color: rgb(72, 72, 72); -unity-text-align: upper-center; -unity-text-outline-color: rgb(253, 251, 251); color: rgb(245, 244, 244);" />
+                        </ui:VisualElement>
+                        <ui:VisualElement style="width: 50%; flex-shrink: 1; flex-direction: row; height: 50%; justify-content: flex-start; border-left-color: rgb(154, 154, 154); border-right-color: rgb(154, 154, 154); border-top-color: rgb(154, 154, 154); border-bottom-color: rgb(154, 154, 154); border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 2px;">
+                            <ui:Label text="RPM" display-tooltip-when-elided="true" style="width: 50%; justify-content: center; height: 30%; top: 30%; background-color: rgb(120, 120, 120); -unity-text-align: upper-center; color: rgb(248, 247, 247); -unity-text-outline-color: rgb(250, 249, 249);" />
+                            <ui:Label text="Label" display-tooltip-when-elided="true" name="RPM" style="flex-direction: column; height: 30%; width: 50%; top: 30%; justify-content: flex-end; background-color: rgb(72, 72, 72); -unity-text-align: upper-center; color: rgb(250, 249, 249);" />
+                        </ui:VisualElement>
+                        <ui:VisualElement style="width: 50%; flex-shrink: 1; flex-direction: row; height: 50%; justify-content: flex-start; border-left-color: rgb(154, 154, 154); border-right-color: rgb(154, 154, 154); border-top-color: rgb(154, 154, 154); border-bottom-color: rgb(154, 154, 154); border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 2px;">
+                            <ui:Label text="Amperaje" display-tooltip-when-elided="true" style="width: 50%; justify-content: center; height: 30%; top: 30%; background-color: rgb(120, 120, 120); -unity-text-align: upper-center; color: rgb(248, 244, 244);" />
+                            <ui:Label text="Label" display-tooltip-when-elided="true" name="Amperaje" style="flex-direction: column; height: 30%; width: 50%; top: 30%; justify-content: flex-end; background-color: rgb(72, 72, 72); -unity-text-align: upper-center; color: rgb(250, 247, 247);" />
+                        </ui:VisualElement>
+                        <ui:VisualElement style="width: 50%; flex-shrink: 1; flex-direction: row; height: 50%; justify-content: flex-start; border-left-color: rgb(154, 154, 154); border-right-color: rgb(154, 154, 154); border-top-color: rgb(154, 154, 154); border-bottom-color: rgb(154, 154, 154); border-left-width: 2px; border-right-width: 2px; border-top-width: 2px; border-bottom-width: 2px;">
+                            <ui:Label text="Empuje" display-tooltip-when-elided="true" style="width: 50%; justify-content: center; height: 30%; top: 30%; background-color: rgb(120, 120, 120); -unity-text-align: upper-center; color: rgb(245, 244, 244);" />
+                            <ui:Label text="Label" display-tooltip-when-elided="true" name="Empuje" style="flex-direction: column; height: 30%; width: 50%; top: 30%; justify-content: flex-end; background-color: rgb(72, 72, 72); -unity-text-align: upper-center; color: rgb(248, 242, 242);" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
