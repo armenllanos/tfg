@@ -10,7 +10,7 @@ namespace DefaultNamespace
         public double actualRPM;
         public double actualThrust;
         public double actualCurrent;
-        int fanColumn;
+        public int fanColumn;
         private const double MAX_VELOCITY = 9.2;
 
         public Ventilador(int fanNum,int fanColumn, double actualVelocity, double actualRpm, double actualThrust, double actualCurrent)

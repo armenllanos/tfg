@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using DefaultNamespace;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -57,6 +58,9 @@ public class Creator2D : MonoBehaviour
     private Label frameLabel;
 
     private Ventilador[,] fans;
+    private Ventilador[] selectedFans = new Ventilador[128];
+    private Ventilador fanForAll;
+    private  int selected;
     double currentX = -0.09194635; //Data calculated by the script
     double currentX2 = 0.03139418;
     double currentCutY = 0.19078497667231487;
@@ -74,6 +78,7 @@ public class Creator2D : MonoBehaviour
 
     private void OnEnable()
     {
+        fanForAll = new Ventilador(0, 0, 0, 0, 0, 0);
         menu = GetComponent<UIDocument>();
         VisualElement root = menu.rootVisualElement;
         root.Q<VisualElement>("centro").visible = false;
@@ -88,8 +93,9 @@ public class Creator2D : MonoBehaviour
 
         startButton = root.Q<Button>("startButton");
         startButton.text = "Next";
-        IStyle color = startButton.style;
-        color.backgroundColor = new StyleColor(new Color((float)0.37,(float)0.78,(float)0.94));
+
+        
+        
         numFansX.RegisterCallback<ClickEvent, string>(updateNumberOfFans, "X");
         numFansY.RegisterCallback<ClickEvent, string>(updateNumberOfFans, "Y");
         startButton.RegisterCallback<ClickEvent>(chooseSize);
@@ -97,12 +103,15 @@ public class Creator2D : MonoBehaviour
         root.Q<VisualElement>("datos").Q<VisualElement>("totalThrust").Q<Label>("thrust").text = 0.ToString();
         root.Q<VisualElement>("datos").Q<VisualElement>("totalPower").Q<Label>("power").text = 0.ToString();
         
+        root.Q<Button>("showPressure").RegisterCallback<ClickEvent>(showingPressure);
         root.Q<Button>("configureButton").RegisterCallback<ClickEvent>(showConfiguration);
+        root.Q<Button>("selectButton").RegisterCallback<ClickEvent>(selectMultiple);
+        
         for (int i = 0; i < 16; i++)
         {
             for (int j = 0; j < 16; j++)
             {
-                fans[i,j] = new Ventilador(i + 1, 0, calclateRPM(0), calculateThrust(0.0), calculateCurrent(0.0));
+                fans[i,j] = new Ventilador(j + 1, i+1, 0,calclateRPM(0), calculateThrust(0.0), calculateCurrent(0.0));
                 root.Q<VisualElement>("fanColumn" + (i + 1)).Q<Button>("fan"+(j+1)).RegisterCallback<ClickEvent,Ventilador>(showFan,fans[i,j]);
                 root.Q<VisualElement>("fanColumn" + (i + 1)).Q<Button>("fan" + (j + 1)).visible = false;
                 
@@ -110,6 +119,97 @@ public class Creator2D : MonoBehaviour
         }
     }
 
+    private void showingPressure(ClickEvent evt)
+    {
+        showPressure = !showPressure;
+    }
+    private void selectMultiple(ClickEvent evt)
+    {
+        selection = true;
+        selected = 0;
+        VisualElement root = menu.rootVisualElement;
+        root.Q<Button>("selectButton").RegisterCallback<ClickEvent>(changeAll);
+        root.Q<Button>("selectButton").UnregisterCallback<ClickEvent>(selectMultiple);
+        root.Q<Button>("selectButton").text = "Done";
+        
+    }
+
+    private void setFans(ClickEvent evt)
+    {
+        VisualElement root = menu.rootVisualElement;
+        for (int i = 0; i < selected; i++)
+        {
+            int row = selectedFans[i].fanNum-1;
+            int column = selectedFans[i].fanColumn-1;
+            
+            totalCurrent -= selectedFans[i].actualCurrent;
+            totalCurrent += fanForAll.actualCurrent;
+
+            totalThrust -= selectedFans[i].actualThrust;
+            totalThrust += fanForAll.actualThrust;
+
+            fans[column,row].actualVelocity = fanForAll.actualVelocity;
+            fans[column,row].actualRPM = fanForAll.actualRPM;
+            fans[column,row].actualThrust = fanForAll.actualThrust;
+            fans[column,row].actualCurrent = fanForAll.actualCurrent;
+            
+            if (selectedFans[i].fanColumn == axis)
+            {
+                if (fluid != null)
+                {
+                    fluid.speed[selectedFans[i].fanNum-1] = selectedFans[i].actualVelocity;
+                    
+                }
+                this.speeds[selectedFans[i].fanNum-1] = selectedFans[i].actualVelocity;
+            }
+
+        }
+        selected = 0;
+        selectedFans = new Ventilador[128];
+        selection = false;
+        root.Q<VisualElement>("totalThrust").Q<Label>("thrust").text = (totalThrust).ToString();
+        root.Q<VisualElement>("totalPower").Q<Label>("power").text = (totalCurrent).ToString();
+        root.Q<Button>("configureButton").RegisterCallback<ClickEvent>(showConfiguration);
+        root.Q<Button>("configureButton").UnregisterCallback<ClickEvent>(setFans);
+        root.Q<Button>("configureButton").text = "Configure";
+        root.Q<Button>("configureButton").style.backgroundColor = new StyleColor(new Color((float)0.16, (float)0.16, (float)0.16,(float)0.82));
+  
+        for (int i = 0; i < fansX; i++)
+        {
+            for (int j = 0; j < fansY; j++)
+            {
+                root.Q<VisualElement>("fanColumn" + (i + 1)).Q<Button>("fan" + (j + 1)).visible = false;
+            }
+        }
+        root.Q<Button>("fanInfo").visible = false;
+        root.Q<Button>("selectButton").visible = false;
+        root.Q<Button>("selectButton").text = "Selects";
+    
+    }
+
+    private void changeAll(ClickEvent evt)
+    {
+        VisualElement root = menu.rootVisualElement;
+        int row, column;
+       
+        root.Q<VisualElement>("fanInfo").Q<Label>("number").text =
+            "Parameters for all the fans";
+        root.Q<VisualElement>("fanInfo").Q<Label>("Velocity").text =  0.ToString()+"m/s";
+        root.Q<VisualElement>("fanInfo").Q<Label>("RPM").text = 0.ToString();
+        root.Q<VisualElement>("fanInfo").Q<Label>("Amperaje").text = 0.ToString()+"A";
+        root.Q<VisualElement>("fanInfo").Q<Label>("Empuje").text = 0.ToString()+"N";
+        root.Q<VisualElement>("fanInfo").Q<SliderInt>("VelocityPercentaje").value = 0;
+        root.Q<VisualElement>("fanInfo").visible = true;
+        root.Q<SliderInt>("VelocityPercentaje")
+            .RegisterCallback<ClickEvent, Ventilador>(changeVelocity,null);
+        root.Q<Button>("configureButton").RegisterCallback<ClickEvent>(setFans);
+        root.Q<Button>("configureButton").UnregisterCallback<ClickEvent>(showConfiguration);
+        root.Q<Button>("configureButton").text = "Accept";
+        root.Q<Button>("configureButton").style.backgroundColor = new StyleColor(new Color(1, (float)0.5, (float)0.5));
+        root.Q<Button>("selectButton").visible = false;
+        root.Q<Button>("selectButton").RegisterCallback<ClickEvent>(selectMultiple);
+        root.Q<Button>("selectButton").UnregisterCallback<ClickEvent>(changeAll);
+    }
     private void showConfiguration(ClickEvent evt)
     {
         VisualElement root = menu.rootVisualElement;
@@ -117,86 +217,184 @@ public class Creator2D : MonoBehaviour
         {
             for (int j = 0; j < fansY; j++)
             {
+                if (i + 1 == axis)
+                {
+                    IStyle color = root.Q<VisualElement>("fanColumn" + (i + 1)).Q<Button>("fan" + (j + 1)).style;
+                    color.backgroundColor = new StyleColor(new Color((float)0.47,(float)0.68,(float)0.94,(float)0.5));
+                }
+                else
+                {
+                    IStyle color = root.Q<VisualElement>("fanColumn" + (i + 1)).Q<Button>("fan" + (j + 1)).style;
+                    color.backgroundColor = new StyleColor(new Color((float)0.6,(float)0.58,(float)0.58,(float)0.61));
+                }
                 root.Q<VisualElement>("fanColumn" + (i + 1)).Q<Button>("fan" + (j + 1)).visible = true;
             }
         }
-        
+        root.Q<Button>("selectButton").visible = true;
+        root.Q<Button>("configureButton").UnregisterCallback<ClickEvent>(showConfiguration);
+        root.Q<Button>("configureButton").RegisterCallback<ClickEvent>(hideConfiguration);
+        root.Q<Button>("configureButton").text = "Hide";
+
     }
 
+    private void hideConfiguration(ClickEvent evt)
+    {
+        VisualElement root = menu.rootVisualElement;
+        root.Q<Button>("configureButton").RegisterCallback<ClickEvent>(showConfiguration);
+        root.Q<Button>("configureButton").UnregisterCallback<ClickEvent>(hideConfiguration);
+        root.Q<Button>("configureButton").text = "Configure";
+        for (int i = 0; i < fansX; i++)
+        {
+            for (int j = 0; j < fansY; j++)
+            {
+                root.Q<VisualElement>("fanColumn" + (i + 1)).Q<Button>("fan" + (j + 1)).visible = false;
+            }
+        }
+        root.Q<Button>("selectButton").visible = false;
+        root.Q<Button>("fanInfo").visible = false;
+    }
     private void showFan(ClickEvent evt, Ventilador fan)
     {
         VisualElement root = menu.rootVisualElement;
-        int row, column;
-        row = Math.Abs( position.Item2 - 16);
-        column = Math.Abs(position.Item1 - 16);
-        root.Q<VisualElement>("fanInfo").Q<Label>("number").text =
-            "Fan of row: " + position.Item2 + " column: " + position.Item1;
-        root.Q<VisualElement>("fanInfo").Q<Label>("Velocity").text =  fans[column,row].actualVelocity.ToString()+"m/s";
-        root.Q<VisualElement>("fanInfo").Q<Label>("RPM").text = fans[column,row].actualRPM.ToString().Substring(0, Math.Min(6, fans[column,row].actualRPM.ToString().Length));
-        root.Q<VisualElement>("fanInfo").Q<Label>("Amperaje").text = fans[column,row].actualCurrent.ToString().Substring(0, Math.Min(6, fans[column,row].actualCurrent.ToString().Length))+"A";
-        root.Q<VisualElement>("fanInfo").Q<Label>("Empuje").text = fans[column,row].actualThrust.ToString().Substring(0, Math.Min(6, fans[column,row].actualThrust.ToString().Length))+"N";
-        root.Q<VisualElement>("fanInfo").Q<SliderInt>("VelocityPercentaje").value =
-            (int)(fans[column,row].actualVelocity / MAX_VELOCITY)*100 ;
-        root.Q<VisualElement>("fanInfo").visible = true;
-        root.Q<SliderInt>("VelocityPercentaje")
-            .RegisterCallback<ClickEvent, Ventilador>(changeVelocity, fans[i,j]);
+        
+        if (selection)
+        {
+            if (!selectedFans.Contains(fan))
+            {
+                IStyle color = root.Q<VisualElement>("fanColumn" + fan.fanColumn).Q<Button>("fan" + fan.fanNum).style;
+                color.backgroundColor = new StyleColor(new Color((float)0.37,(float)0.78,(float)0.94,(float)1));
+                selectedFans[selected] = fan;
+                selected++;
+            }
+            else
+            {
+                
+                Ventilador[] aux = new Ventilador[128]; 
+                int i = 0;
+                while(i < selected-1)
+                {
+                    if (!selectedFans[i].Equals(fan))
+                    {
+                        aux[i] = selectedFans[i];
+                        i++;
+                    }
+                }
+                selected--;
+                selectedFans = aux;
+                IStyle color = root.Q<VisualElement>("fanColumn" + fan.fanColumn).Q<Button>("fan" + fan.fanNum).style;
+                color.backgroundColor = new StyleColor(new Color((float)0.6,(float)0.58,(float)0.58,(float)0.61));
+            }
+        }
+        else
+        {
+            for (int i = 0; i < fansX; i++)
+            {
+                for (int j = 0; j < fansY; j++)
+                {
+                    if (i + 1 == axis)
+                    {
+                        IStyle color = root.Q<VisualElement>("fanColumn" + (i + 1)).Q<Button>("fan" + (j + 1)).style;
+                        color.backgroundColor = new StyleColor(new Color((float)0.47,(float)0.68,(float)0.94,(float)0.5));
+                    }
+                    else
+                    {
+                        IStyle color = root.Q<VisualElement>("fanColumn" + (i + 1)).Q<Button>("fan" + (j + 1)).style;
+                        color.backgroundColor = new StyleColor(new Color((float)0.6,(float)0.58,(float)0.58,(float)0.61));
+                    }
+                    root.Q<VisualElement>("fanColumn" + (i + 1)).Q<Button>("fan" + (j + 1)).visible = true;
+                }
+            }
+            root.Q<Button>("selectButton").visible = true; 
+            IStyle ncolor = root.Q<VisualElement>("fanColumn" + fan.fanColumn).Q<Button>("fan" + fan.fanNum).style;
+            ncolor.backgroundColor = new StyleColor(new Color((float)0.37,(float)0.78,(float)0.94,(float)1));
+            int row, column;
+            root.Q<VisualElement>("fanInfo").Q<Label>("number").text =
+                "Fan of row: " + fan.fanNum + " column: " + fan.fanColumn;
+            root.Q<VisualElement>("fanInfo").Q<Label>("Velocity").text =  fan.actualVelocity.ToString()+"m/s";
+            root.Q<VisualElement>("fanInfo").Q<Label>("RPM").text = fan.actualRPM.ToString().Substring(0, Math.Min(6, fan.actualRPM.ToString().Length));
+            root.Q<VisualElement>("fanInfo").Q<Label>("Amperaje").text = fan.actualCurrent.ToString().Substring(0, Math.Min(6, fan.actualCurrent.ToString().Length))+"A";
+            root.Q<VisualElement>("fanInfo").Q<Label>("Empuje").text = fan.actualThrust.ToString().Substring(0, Math.Min(6, fan.actualThrust.ToString().Length))+"N";
+            root.Q<VisualElement>("fanInfo").Q<SliderInt>("VelocityPercentaje").value =
+                (int)((fan.actualVelocity*100 / MAX_VELOCITY)) ;
+            root.Q<VisualElement>("fanInfo").visible = true;
+            root.Q<SliderInt>("VelocityPercentaje")
+                .RegisterCallback<ClickEvent, Ventilador>(changeVelocity, fan);
+        }
+        
     }
     private void changeVelocity(ClickEvent evt, Ventilador fan)
     {
         VisualElement root = menu.rootVisualElement;
         int row, column;
-        row = Math.Abs( number.Item2 - 16);
-        column = Math.Abs(number.Item1 - 16);
+        
         double velocity, RPM, current, thrust;
-        double oldThrust = fans[column,row].actualThrust;
-        double oldCurrent = fans[column,row].actualCurrent;
+        
+        
+       
         int percentaje = root.Q<SliderInt>("VelocityPercentaje").value;
         velocity = percentaje * MAX_VELOCITY / 100;
         RPM = calclateRPM(velocity);
         current = calculateCurrent(velocity);
         thrust = calculateThrust(RPM);
-        fans[column,row].actualThrust = thrust;
-        fans[column,row].actualCurrent = current;
+        if (fan == null)
+        {
+            fanForAll = new Ventilador(0, 0, velocity, RPM, thrust, current);
+            root.Q<VisualElement>("fanInfo").Q<Label>("Velocity").text =  (velocity).ToString()+"m/s";
+            root.Q<VisualElement>("fanInfo").Q<Label>("RPM").text = RPM.ToString().Substring(0, Math.Min(6, RPM.ToString().Length));
+            root.Q<VisualElement>("fanInfo").Q<Label>("Amperaje").text = current.ToString().Substring(0, Math.Min(6, current.ToString().Length))+"A";
+            root.Q<VisualElement>("fanInfo").Q<Label>("Empuje").text = thrust.ToString().Substring(0, Math.Min(6, thrust.ToString().Length))+"N";
+           
+        }
+        else
+        {
+            IStyle color = root.Q<VisualElement>("fanColumn" + fan.fanColumn).Q<Button>("fan" + fan.fanNum).style;
+            color.backgroundColor = new StyleColor(new Color((float)0.6,(float)0.58,(float)0.58,(float)0.61));
+            fan.actualThrust = thrust;
+            fan.actualCurrent = current;
+            double oldThrust = fan.actualThrust;
+            double oldCurrent = fan.actualCurrent;
       
-        String positionText = root.Q<VisualElement>("fanInfo").Q<Label>("number").text;
-        String[] tokens = positionText.Split(" ");
+            String positionText = root.Q<VisualElement>("fanInfo").Q<Label>("number").text;
+            String[] tokens = positionText.Split(" ");
        
 
 
-        root.Q<VisualElement>("fanInfo").Q<Label>("Velocity").text =  (velocity).ToString()+"m/s";
-        fans[column, row].actualVelocity = velocity;
+            root.Q<VisualElement>("fanInfo").Q<Label>("Velocity").text =  (velocity).ToString()+"m/s";
+            fan.actualVelocity = velocity;
         
-        root.Q<VisualElement>("fanInfo").Q<Label>("RPM").text = RPM.ToString().Substring(0, Math.Min(6, RPM.ToString().Length));
-        fans[column, row].actualRPM = RPM;
+            root.Q<VisualElement>("fanInfo").Q<Label>("RPM").text = RPM.ToString().Substring(0, Math.Min(6, RPM.ToString().Length));
+            fan.actualRPM = RPM;
         
-        root.Q<VisualElement>("fanInfo").Q<Label>("Amperaje").text = current.ToString().Substring(0, Math.Min(6, current.ToString().Length))+"A";
-        fans[column, row].actualCurrent = current;
+            root.Q<VisualElement>("fanInfo").Q<Label>("Amperaje").text = current.ToString().Substring(0, Math.Min(6, current.ToString().Length))+"A";
+            fan.actualCurrent = current;
         
-        root.Q<VisualElement>("fanInfo").Q<Label>("Empuje").text = thrust.ToString().Substring(0, Math.Min(6, thrust.ToString().Length))+"N";
-        fans[column, row].actualThrust = thrust;
-        if (!selection)
-        {
-            if (column == axis)
+            root.Q<VisualElement>("fanInfo").Q<Label>("Empuje").text = thrust.ToString().Substring(0, Math.Min(6, thrust.ToString().Length))+"N";
+            fan.actualThrust = thrust;
+            if (!selection)  
             {
-                if (fluid != null)
+                if (fan.fanColumn == axis)
                 {
-                    fluid.speed[row] = velocity;
+                    if (fluid != null)
+                    {
+                        fluid.speed[fan.fanNum-1] = velocity;
+                    }
+                    this.speeds[fan.fanNum-1] = velocity;
                 }
-                this.speeds[row] = velocity;
             }
+
+
+            totalCurrent -= oldCurrent;
+            totalCurrent += current;
+
+            totalThrust -= oldThrust;
+            totalThrust += thrust;
+
+            root.Q<VisualElement>("totalThrust").Q<Label>("thrust").text =
+                (totalThrust).ToString()+"N";
+            root.Q<VisualElement>("totalPower").Q<Label>("power").text =
+                (totalCurrent).ToString()+"A";
         }
-
-
-        totalCurrent -= oldCurrent;
-        totalCurrent += current;
-
-        totalThrust -= oldThrust;
-        totalThrust += thrust;
-
-        root.Q<VisualElement>("totalThrust").Q<Label>("thrust").text =
-            (totalThrust).ToString().Substring(0, Math.Min(6, thrust.ToString().Length));
-        root.Q<VisualElement>("totalPower").Q<Label>("power").text =
-            (totalCurrent).ToString().Substring(0, Math.Min(6, thrust.ToString().Length));
+       
     }
 
     private void updateNumberOfFans(ClickEvent evt, string pos)
@@ -251,9 +449,15 @@ public class Creator2D : MonoBehaviour
         {
             for (int j = 0; j < fansY; j++)
             {
+                if (i + 1 == axis)
+                {
+                    IStyle color = root.Q<VisualElement>("fanColumn" + (i + 1)).Q<Button>("fan" + (j + 1)).style;
+                    color.backgroundColor = new StyleColor(new Color((float)0.47,(float)0.68,(float)0.94,(float)0.5));
+                }
                 root.Q<VisualElement>("fanColumn" + (i + 1)).Q<Button>("fan" + (j + 1)).visible = true;
             }
         }
+        root.Q<Button>("selectButton").visible = true;
 
         startButton.UnregisterCallback<ClickEvent>(configure);
         startButton.RegisterCallback<ClickEvent>(start);
@@ -269,17 +473,42 @@ public class Creator2D : MonoBehaviour
 
         for (int i = 0; i < numberOfFans; i++)
         {
+            if (axis > 1)
+            {
+                Vector3 positionBefore = new Vector3(-5, i * 20 + 10,
+                    -15);
+                Vector3 rotationBefore = new Vector3(0, -20+(numFansY.value*2), 0);
+                GameObject fanBefore = Instantiate(fanModel, positionBefore, Quaternion.identity, transform);
+                //fanBefore.transform.Rotate(rotationBefore);
+                gameObjects.Add(fanBefore);
+            }
             Vector3 position = new Vector3(-5, i * 20 + 10,
                 10);
             Vector3 rotation = new Vector3(0, -20+(numFansY.value*2), 0);
             GameObject fan = Instantiate(fanModel, position, Quaternion.identity, transform);
-            fan.transform.Rotate(rotation);
+            //fan.transform.Rotate(rotation);
             gameObjects.Add(fan);
         }
 
+        for (int j = 1; j < fansX-axis; j++)
+        {
+            for (int i = 0; i < numberOfFans; i++)
+            {
+                Vector3 position = new Vector3(-5, i * 20 + 10,
+                    10+20*j);
+                Vector3 rotation = new Vector3(0, -20+(numFansY.value*2), 0);
+                GameObject fan = Instantiate(fanModel, position, Quaternion.identity, transform);
+                //fan.transform.Rotate(rotation);
+                gameObjects.Add(fan);
+            }
+        }
+        
+
         numFansX.visible = false;
         numFansX.focusable = false;
-
+        VisualElement root = menu.rootVisualElement;
+        root.Q<Button>("fanInfo").visible = false;
+        root.Q<Button>("fanButtons").visible = false;
         numFansY.visible = false;
         numFansY.focusable = false;
         started = !started;
@@ -328,7 +557,7 @@ public class Creator2D : MonoBehaviour
         started = false;
         myCamera.transform.SetPositionAndRotation(new Vector3(numCubesX / 2, numCubesY / 2, -numCubesX),
             Quaternion.identity);
-        speeds = new double[8];
+        speeds = new double[16];
     }
 
     // Update is called once per frame

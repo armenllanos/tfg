@@ -457,7 +457,7 @@ MonoBehaviour:
   numCubesY: 20
   spacing: 1
   cubePrefab: {fileID: 4235905287973703117, guid: 7d0199eb0c487b5468d7173149cdd194, type: 3}
-  showPressure: 1
+  showPressure: 0
   speed1: 9.2
   speed2: 9.2
   numberOfFans: 2

@@ -37,6 +37,12 @@ namespace DefaultNamespace
             this.computeShader = computeShader;
             this.mode = mode;
             this.speed = speed;
+            /*for (int i = 0; i < numberOfFans; i++)
+            {
+                this.speed[i] = speed[i];
+            }
+            Array.Reverse(this.speed);*/
+            
             this.height = height;
             this.separation = separation;
             this.numX = numX + 2; //para añadir las celdas de los bordes
@@ -76,8 +82,20 @@ namespace DefaultNamespace
             //this.w = new float[this.numX,this.numY,this.numZ];
         }
 
+        public void setSpeed(double[] speed)
+        {
+            this.speed = new double[numberOfFans];
+            for (int i = 0; i < numberOfFans; i++)
+            {
+                this.speed[i] = speed[i];
+                
+            }
+            Array.Reverse(this.speed);
+        }
+
         public void simulate(double dt)
         {
+            
             if (mode.Equals("y0"))
             {
                 for (int i = numX/2;
@@ -106,7 +124,7 @@ namespace DefaultNamespace
                      j++) //we want to have limits, so we put 0 in the borders an 1 inside the field
                 {
                     
-                    u[1 ,j*separation-1] = speed[j-1];
+                    u[1 ,j*separation-1] = speed[numberOfFans-(j)];
                     
                     //smokeField[i, 1, k] = 0;
                    
@@ -123,7 +141,7 @@ namespace DefaultNamespace
             else if (mode.Equals("x1"))
             {
             }
-            modifyVelocity(dt, -3.3);
+            modifyVelocity(dt, -3);
             for (int i = 0; i < numX;i++)
             {
                 for (int j = 0;j < numY;j++)
