@@ -181,7 +181,7 @@ public class Creator2D : MonoBehaviour
                 root.Q<VisualElement>("fanColumn" + (i + 1)).Q<Button>("fan" + (j + 1)).visible = false;
             }
         }
-        root.Q<Button>("fanInfo").visible = false;
+        root.Q<VisualElement>("fanInfo").visible = false;
         root.Q<Button>("selectButton").visible = false;
         root.Q<Button>("selectButton").text = "Selects";
     
@@ -251,7 +251,7 @@ public class Creator2D : MonoBehaviour
             }
         }
         root.Q<Button>("selectButton").visible = false;
-        root.Q<Button>("fanInfo").visible = false;
+        
     }
     private void showFan(ClickEvent evt, Ventilador fan)
     {
@@ -271,13 +271,15 @@ public class Creator2D : MonoBehaviour
                 
                 Ventilador[] aux = new Ventilador[128]; 
                 int i = 0;
-                while(i < selected-1)
+                int auxi = 0;
+                while(i < selected)
                 {
                     if (!selectedFans[i].Equals(fan))
                     {
-                        aux[i] = selectedFans[i];
-                        i++;
+                        aux[auxi] = selectedFans[i];
+                        auxi++;
                     }
+                    i++;
                 }
                 selected--;
                 selectedFans = aux;
@@ -349,10 +351,11 @@ public class Creator2D : MonoBehaviour
         {
             IStyle color = root.Q<VisualElement>("fanColumn" + fan.fanColumn).Q<Button>("fan" + fan.fanNum).style;
             color.backgroundColor = new StyleColor(new Color((float)0.6,(float)0.58,(float)0.58,(float)0.61));
-            fan.actualThrust = thrust;
-            fan.actualCurrent = current;
             double oldThrust = fan.actualThrust;
             double oldCurrent = fan.actualCurrent;
+            fan.actualThrust = thrust;
+            fan.actualCurrent = current;
+    
       
             String positionText = root.Q<VisualElement>("fanInfo").Q<Label>("number").text;
             String[] tokens = positionText.Split(" ");
@@ -390,9 +393,9 @@ public class Creator2D : MonoBehaviour
             totalThrust += thrust;
 
             root.Q<VisualElement>("totalThrust").Q<Label>("thrust").text =
-                (totalThrust).ToString()+"N";
+                (totalThrust).ToString().Substring(0, Math.Min(6, totalThrust.ToString().Length))+"N";
             root.Q<VisualElement>("totalPower").Q<Label>("power").text =
-                (totalCurrent).ToString()+"A";
+                (totalCurrent).ToString().Substring(0, Math.Min(6, totalCurrent.ToString().Length))+"A";
         }
        
     }
@@ -434,7 +437,7 @@ public class Creator2D : MonoBehaviour
         }
 
         VisualElement root = menu.rootVisualElement;
-        root.Q<Label>("Ventiladores").text = "Elige el eje de corte";
+        root.Q<Label>("Ventiladores").text = "Choose axis";
         root.Q<Label>("Y").visible = false;
         startButton.UnregisterCallback<ClickEvent>(chooseSize);
         startButton.RegisterCallback<ClickEvent>(configure);
@@ -507,8 +510,15 @@ public class Creator2D : MonoBehaviour
         numFansX.visible = false;
         numFansX.focusable = false;
         VisualElement root = menu.rootVisualElement;
-        root.Q<Button>("fanInfo").visible = false;
-        root.Q<Button>("fanButtons").visible = false;
+        root.Q<VisualElement>("fanInfo").visible = false;
+        for (int i = 0; i < fansX; i++)
+        {
+            for (int j = 0; j < fansY; j++)
+            {
+                root.Q<VisualElement>("fanColumn" + (i + 1)).Q<Button>("fan" + (j + 1)).visible = false;
+            }
+        }
+        root.Q<Button>("selectButton").visible = false;
         numFansY.visible = false;
         numFansY.focusable = false;
         started = !started;
@@ -600,21 +610,28 @@ public class Creator2D : MonoBehaviour
                     }
                     else
                     {
-                        
-                        Color finalColor = new Color((float)fluid.smokeField[x + 1, y + 1] / (float)Fluid2D.MAX_SPEED,
-                            (float)fluid.smokeField[x + 1, y + 1] / (float)Fluid2D.MAX_SPEED,
-                            (float)fluid.smokeField[x + 1, y + 1] / (float)Fluid2D.MAX_SPEED,
-                            (float)Math.Abs(fluid.smokeField[x + 1, y + 1] - MAX_VELOCITY) /
-                            (float)Fluid2D.MAX_SPEED); //getColorRGB(fluid.smokeField[x + 1, y + 1],0,1);
-                        /*Debug.Log("opacity: " + fluid.smokeField[x, y, z]);*/
-                        cubes[x, y].GetComponent<Renderer>().material.color =
-                            finalColor;
-                        /*Debug.Log("opacity: " + fluid.smokeField[x, y, z] / speed + "smoke value" +
-                                 fluid.smokeField[x, y, z] / speed);*/
-                        if (fluid.s[x, y] == 0)
+                        if (fluid.s[x + 1, y + 1] == 0)
                         {
-                            
+                            Color finalColor = new Color(1, 1, 1,0); //getColorRGB(fluid.smokeField[x + 1, y + 1],0,1);
+                            /*Debug.Log("opacity: " + fluid.smokeField[x, y, z]);*/
+                            cubes[x, y].GetComponent<Renderer>().material.color =
+                                finalColor;
                         }
+                        else
+                        {
+                            Color finalColor = new Color((float)fluid.smokeField[x + 1, y + 1] / (float)Fluid2D.MAX_SPEED,
+                                (float)fluid.smokeField[x + 1, y + 1] / (float)Fluid2D.MAX_SPEED,
+                                (float)fluid.smokeField[x + 1, y + 1] / (float)Fluid2D.MAX_SPEED,
+                                (float)Math.Abs(fluid.smokeField[x + 1, y + 1] - MAX_VELOCITY) /
+                                (float)Fluid2D.MAX_SPEED); //getColorRGB(fluid.smokeField[x + 1, y + 1],0,1);
+                            /*Debug.Log("opacity: " + fluid.smokeField[x, y, z]);*/
+                            cubes[x, y].GetComponent<Renderer>().material.color =
+                                finalColor;
+                            /*Debug.Log("opacity: " + fluid.smokeField[x, y, z] / speed + "smoke value" +
+                                     fluid.smokeField[x, y, z] / speed);*/
+
+                        }
+                        
                     }
                 }
             }
@@ -622,6 +639,7 @@ public class Creator2D : MonoBehaviour
             stopwatch.Stop();
             long wat = stopwatch.ElapsedMilliseconds;
             double time = 1.0 / (stopwatch.ElapsedMilliseconds/1000.0);
+            Debug.Log("frame"+time.ToString().Substring(0, Math.Min(3, time.ToString().Length)));
             frameLabel.text = time.ToString().Substring(0, Math.Min(3, time.ToString().Length));
         }
     }

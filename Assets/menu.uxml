@@ -7,12 +7,12 @@
             </ui:VisualElement>
             <ui:VisualElement name="botones" class="botones">
                 <ui:VisualElement name="arriba" style="height: 80%;">
-                    <ui:Label text="Numero Ventiladores" display-tooltip-when-elided="true" name="Ventiladores" style="font-size: 35px; color: rgb(253, 253, 253); -unity-text-outline-color: rgb(255, 255, 255);" />
+                    <ui:Label text="Number of fans" display-tooltip-when-elided="true" name="Ventiladores" style="font-size: 35px; color: rgb(253, 253, 253); -unity-text-outline-color: rgb(255, 255, 255);" />
                     <ui:Label text="X" display-tooltip-when-elided="true" name="X" style="color: rgb(250, 247, 247);" />
                     <ui:SliderInt picking-mode="Ignore" label="SliderInt" value="1" high-value="16" name="SliderNumberFansX" low-value="1" style="font-size: 1px; color: rgb(5, 0, 0); margin-left: 3px; height: 15%; flex-direction: column;" />
                     <ui:Label text="0" display-tooltip-when-elided="true" name="numberFansX" enable-rich-text="false" style="font-size: 25px; -unity-text-outline-color: rgb(250, 249, 249); color: rgb(250, 249, 249);" />
                     <ui:Label text="Y" display-tooltip-when-elided="true" name="Y" style="color: rgb(248, 242, 242);" />
-                    <ui:SliderInt picking-mode="Ignore" label="SliderInt" value="1" high-value="18" name="SliderNumberFansY" low-value="1" style="font-size: 1px; color: rgb(5, 0, 0); margin-left: 3px; height: 15%; flex-direction: column;" />
+                    <ui:SliderInt picking-mode="Ignore" label="SliderInt" value="1" high-value="16" name="SliderNumberFansY" low-value="1" style="font-size: 1px; color: rgb(5, 0, 0); margin-left: 3px; height: 15%; flex-direction: column;" />
                     <ui:Label text="0" display-tooltip-when-elided="true" name="numberFansY" enable-rich-text="false" style="font-size: 25px; color: rgb(255, 255, 255); -unity-text-outline-color: rgb(255, 255, 255);" />
                 </ui:VisualElement>
                 <ui:VisualElement name="abajo" class="abajo" style="margin-right: 10px;">

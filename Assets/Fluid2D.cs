@@ -134,7 +134,8 @@ namespace DefaultNamespace
                     s[numX-1,i] = 1;
                 }
 
-                this.s[numX / 2, numY / 2] = 0;
+                /*this.s[numX / 2, numY / 2] = 0;
+                this.s[numX / 2, numY / 2-1] = 0;*/
 
                 //s[numX / 2, numY / 2] = 0;
             }
@@ -198,7 +199,7 @@ namespace DefaultNamespace
             else if (mode.Equals("x1"))
             {
             }
-            modifyVelocity(dt, 0);
+            modifyVelocity(dt, -3);
             for (int i = 0; i < numX;i++)
             {
                 for (int j = 0;j < numY;j++)
@@ -234,7 +235,8 @@ namespace DefaultNamespace
             double[] auxU = new double[this.numX * this.numY],
                 auxV = new double[this.numX * this.numY],
                 ubuffer = new double[this.numX * this.numY],
-                vbuffer = new double[this.numX * this.numY];
+                vbuffer = new double[this.numX * this.numY],
+                pbuffer = new double[this.numX * this.numY];
             int[] sbuffer = new int[this.numX * this.numY];
      
          
@@ -252,14 +254,19 @@ namespace DefaultNamespace
             
             computeShader.SetInt("numY",this.numY);
             computeShader.SetInt("numX",this.numX);
+            computeShader.SetFloat("dt",(float)dt);
+            computeShader.SetFloat("density",(float)this.density);
+            computeShader.SetFloat("height",(float)this.height);
             
             ComputeBuffer uComputeBuffer = new ComputeBuffer(ubuffer.Length,sizeof(double));
             ComputeBuffer vComputeBuffer = new ComputeBuffer(vbuffer.Length,sizeof(double));
+            ComputeBuffer pComputeBuffer = new ComputeBuffer(pbuffer.Length,sizeof(double));
             ComputeBuffer auxUComputeBuffer = new ComputeBuffer(auxU.Length,sizeof(double));
             ComputeBuffer auxVComputeBuffer = new ComputeBuffer(auxV.Length,sizeof(double));
             ComputeBuffer sComputeBuffer = new ComputeBuffer(sbuffer.Length,sizeof(int));
             auxUComputeBuffer.SetData(ubuffer);
             auxVComputeBuffer.SetData(vbuffer);
+            
             sComputeBuffer.SetData(sbuffer);
             
             computeShader.SetBuffer(0,"auxU",auxUComputeBuffer);
@@ -272,17 +279,21 @@ namespace DefaultNamespace
             {
                 uComputeBuffer.SetData(ubuffer);// fill the buffer with the new data
                 vComputeBuffer.SetData(vbuffer);// 
+                pComputeBuffer.SetData(pbuffer);
                 computeShader.SetBuffer(0,"u",uComputeBuffer);
                 computeShader.SetBuffer(0,"v",vComputeBuffer);
+                computeShader.SetBuffer(0,"p",pComputeBuffer);
                 computeShader.Dispatch(0,numX/10,numY/10,1);
                 auxUComputeBuffer.GetData(ubuffer);//u = auxU
                 auxVComputeBuffer.GetData(vbuffer);//v = auxV
+                pComputeBuffer.GetData(pbuffer);
+                
                 
             }
          
             uComputeBuffer.Dispose();
             vComputeBuffer.Dispose();
-
+            pComputeBuffer.Dispose();
             auxUComputeBuffer.Dispose();
             auxVComputeBuffer.Dispose();
 
@@ -295,6 +306,7 @@ namespace DefaultNamespace
                     
                         this.u[i, j] = ubuffer[i*numY+j];
                         this.v[i,j] =vbuffer[i*numY+j];
+                        this.p[i,j] = pbuffer[i*numY+j];
                     
                 }
             }
@@ -309,6 +321,7 @@ namespace DefaultNamespace
                 results += "\n";
                 
             }
+            
             /*Debug.Log(results);*/
             Debug.Log("iterations:"+ l);
 
@@ -323,6 +336,12 @@ namespace DefaultNamespace
             bool converged = false;
             double error = 0.00001;
             int l = 0;
+            
+            Stopwatch sw = new Stopwatch(); 
+            sw.Start(); 
+
+
+
             
             double outflowAvg = 0;
             for (l = 0; (l < iterations && !converged); l++)
@@ -365,7 +384,7 @@ namespace DefaultNamespace
                 }
 
             }
-            Debug.Log("iterations:"+ l); 
+            //Debug.Log("iterations:"+ l); 
             /*String results = "";
             for (int i = 0; i < numX;i++)
             {
@@ -378,6 +397,8 @@ namespace DefaultNamespace
                 
             }*/
             /*Debug.Log(results);*/
+            sw.Stop(); 
+            //Debug.Log("Time elapsed: {0}"+ sw.Elapsed.ToString("hh\\:mm\\:ss\\.fff"));
            
             for (int j = 0; j < this.numY; j++)
             {

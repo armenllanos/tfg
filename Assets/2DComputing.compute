@@ -8,6 +8,7 @@ RWTexture2D<float4> Result;
 
 RWStructuredBuffer<double> u;
 RWStructuredBuffer<double> v;
+RWStructuredBuffer<double> p;
 RWStructuredBuffer<double> auxU;
 RWStructuredBuffer<double> auxV;
 RWStructuredBuffer<int> s;
@@ -16,7 +17,7 @@ RWStructuredBuffer<int> s;
 int numY;
 
 int numX;
-
+float dt,density,height;
 
 [numthreads(10,10,1)]
 void Incomprenssibility (uint3 id : SV_DispatchThreadID)
@@ -47,6 +48,7 @@ void Incomprenssibility (uint3 id : SV_DispatchThreadID)
                 auxV[i*numY+ j] = v[i*numY+ j] + outflow * s[i*numY+ j - 1] / actualS;
                 auxV[i*numY+ j + 1] =
                     v[i*numY+ j + 1] - outflow * s[i*numY+ j + 1] / actualS;
+                p[i*numY+ j] += (-outflow / actualS) * (density * height / dt);
 
             }
         }
