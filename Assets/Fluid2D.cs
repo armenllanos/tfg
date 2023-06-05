@@ -142,7 +142,7 @@ namespace DefaultNamespace
             else if (mode.Equals("x1"))
             {
             }
-            modifyVelocity(dt, -3);
+            modifyVelocity(dt, 0);
             for (int i = 0; i < numX;i++)
             {
                 for (int j = 0;j < numY;j++)
@@ -199,7 +199,7 @@ namespace DefaultNamespace
             else if (mode.Equals("x1"))
             {
             }
-            modifyVelocity(dt, -3);
+            modifyVelocity(dt, 0);
             for (int i = 0; i < numX;i++)
             {
                 for (int j = 0;j < numY;j++)
@@ -272,25 +272,25 @@ namespace DefaultNamespace
             computeShader.SetBuffer(0,"auxU",auxUComputeBuffer);
             computeShader.SetBuffer(0,"auxV",auxVComputeBuffer);
             computeShader.SetBuffer(0,"s",sComputeBuffer);
-            
-            
-            
+            uComputeBuffer.SetData(ubuffer);// fill the buffer with the new data
+            vComputeBuffer.SetData(vbuffer);// 
+            pComputeBuffer.SetData(pbuffer);
+            computeShader.SetBuffer(0,"u",uComputeBuffer);
+            computeShader.SetBuffer(0,"v",vComputeBuffer);
+            computeShader.SetBuffer(0,"p",pComputeBuffer);
+
             for (l = 0; (l < iterations); l++)
             {
-                uComputeBuffer.SetData(ubuffer);// fill the buffer with the new data
-                vComputeBuffer.SetData(vbuffer);// 
-                pComputeBuffer.SetData(pbuffer);
-                computeShader.SetBuffer(0,"u",uComputeBuffer);
-                computeShader.SetBuffer(0,"v",vComputeBuffer);
-                computeShader.SetBuffer(0,"p",pComputeBuffer);
+               
+          
                 computeShader.Dispatch(0,numX/10,numY/10,1);
-                auxUComputeBuffer.GetData(ubuffer);//u = auxU
-                auxVComputeBuffer.GetData(vbuffer);//v = auxV
-                pComputeBuffer.GetData(pbuffer);
+                
                 
                 
             }
-         
+            auxUComputeBuffer.GetData(ubuffer);//u = auxU
+            auxVComputeBuffer.GetData(vbuffer);//v = auxV
+            pComputeBuffer.GetData(pbuffer);
             uComputeBuffer.Dispose();
             vComputeBuffer.Dispose();
             pComputeBuffer.Dispose();

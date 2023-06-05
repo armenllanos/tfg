@@ -167,8 +167,8 @@ public class Creator2D : MonoBehaviour
         selected = 0;
         selectedFans = new Ventilador[128];
         selection = false;
-        root.Q<VisualElement>("totalThrust").Q<Label>("thrust").text = (totalThrust).ToString();
-        root.Q<VisualElement>("totalPower").Q<Label>("power").text = (totalCurrent).ToString();
+        root.Q<VisualElement>("totalThrust").Q<Label>("thrust").text =  (totalThrust).ToString().Substring(0, Math.Min(6, totalThrust.ToString().Length))+"N";
+        root.Q<VisualElement>("totalPower").Q<Label>("power").text =  (totalCurrent).ToString().Substring(0, Math.Min(6, totalCurrent.ToString().Length))+"A";
         root.Q<Button>("configureButton").RegisterCallback<ClickEvent>(showConfiguration);
         root.Q<Button>("configureButton").UnregisterCallback<ClickEvent>(setFans);
         root.Q<Button>("configureButton").text = "Configure";
@@ -464,6 +464,7 @@ public class Creator2D : MonoBehaviour
 
         startButton.UnregisterCallback<ClickEvent>(configure);
         startButton.RegisterCallback<ClickEvent>(start);
+        startButton.text = "Start";
     }
 
     private void start(ClickEvent evt)

@@ -464,7 +464,7 @@ MonoBehaviour:
   cellSize: 1
   myCamera: {fileID: 630948427}
   fanModel: {fileID: 206132833}
-  GPU: 1
+  GPU: 0
 --- !u!114 &1080818675
 MonoBehaviour:
   m_ObjectHideFlags: 0

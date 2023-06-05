@@ -35,8 +35,11 @@ void Incomprenssibility (uint3 id : SV_DispatchThreadID)
                       s[i*numY+ j - 1];
             if (actualS != 0)
             {
-           
-            
+                u[i*numY+ j] = auxU[i *numY+ j];
+                u[(i + 1)*numY+ j] = auxU[(i + 1)*numY+ j];
+                v[i*numY+ j] = auxV[i*numY+ j];
+                v[i*numY+ j + 1] = auxV[i*numY+ j + 1];
+                
                 outflow = u[(i + 1)*numY+ j] - u[i*numY+ j] + v[i*numY+ j + 1] -
                           v[i*numY+ j];
                 outflow*=overrelaxation;
